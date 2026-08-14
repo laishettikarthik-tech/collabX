@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        CollabX Dashboard
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<nav class="navbar">
+
+    <div class="nav-logo">
+
+        Collab<span>X</span>
+
+    </div>
+
+
+    <div class="nav-links">
+
+        <a href="/profile">
+            My Profile
+        </a>
+
+        <a href="/edit-profile">
+            Edit Profile
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+
+<main class="dashboard">
+
+
+    <section class="welcome-card">
+
+
+        <div>
+
+            <h1>
+
+                Welcome,
+                {{ user["first_name"] }}! 🚀
+
+            </h1>
+
+
+            <p>
+
+                You're ready to build
+                your next collaboration.
+
+            </p>
+
+        </div>
+
+
+        {% if user["profile_picture"] %}
+
+        <img
+            src="{{ url_for(
+                'static',
+                filename=user['profile_picture']
+            ) }}"
+            class="dashboard-picture"
+        >
+
+        {% else %}
+
+        <div class="dashboard-placeholder">
+
+            {{ user["first_name"][0] }}
+
+        </div>
+
+        {% endif %}
+
+
+    </section>
+
+
+
+    <!-- PROFILE COMPLETION -->
+
+    <section class="completion-card">
+
+        <h2>
+            Complete your profile
+        </h2>
+
+
+        <p>
+
+            A complete profile helps
+            companies and creators
+            find you.
+
+        </p>
+
+
+        <a
+            href="/edit-profile"
+            class="primary-button"
+        >
+            Complete Profile →
+        </a>
+
+    </section>
+
+
+
+    <!-- FEATURES -->
+
+    <section class="dashboard-grid">
+
+
+        <div class="dashboard-card">
+
+            <div class="card-icon">
+                🔎
+            </div>
+
+            <h2>
+                Discover
+            </h2>
+
+            <p>
+
+                Find creators, companies,
+                filmmakers, athletes,
+                engineers and collaborators.
+
+            </p>
+
+        </div>
+
+
+
+        <div class="dashboard-card">
+
+            <div class="card-icon">
+                🤝
+            </div>
+
+            <h2>
+                Collaborate
+            </h2>
+
+            <p>
+
+                Create projects and invite
+                multiple people to your team.
+
+            </p>
+
+        </div>
+
+
+
+        <div class="dashboard-card">
+
+            <div class="card-icon">
+                🚀
+            </div>
+
+            <h2>
+                Projects
+            </h2>
+
+            <p>
+
+                Manage your collaborations,
+                teams and upcoming projects.
+
+            </p>
+
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+</body>
+
+</html>

@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Discover - CollabX</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+    <style>
+
+        .discover-page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .discover-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .discover-header h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .discover-header p {
+            color: #64748b;
+            font-size: 17px;
+        }
+
+        .search-box {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 35px;
+        }
+
+        .search-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .search-row input,
+        .search-row select {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #dbe2ea;
+            border-radius: 10px;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        .search-button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .search-button:hover {
+            background: #1d4ed8;
+        }
+
+        .results-title {
+            margin-bottom: 20px;
+        }
+
+        .results-title h2 {
+            margin-bottom: 5px;
+        }
+
+        .results-title p {
+            color: #64748b;
+        }
+
+        .people-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 22px;
+        }
+
+        .person-card {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow:
+                0 8px 25px
+                rgba(0,0,0,0.07);
+        }
+
+        .person-top {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .profile-image {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #e2e8f0;
+        }
+
+        .profile-placeholder {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: #2563eb;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .person-name {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .person-role {
+            color: #2563eb;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .bio {
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .info {
+            margin: 8px 0;
+            color: #475569;
+            font-size: 14px;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin: 15px 0;
+        }
+
+        .skill {
+            background: #eff6ff;
+            color: #2563eb;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .card-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .view-button,
+        .invite-button {
+            flex: 1;
+            text-align: center;
+            padding: 11px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .view-button {
+            border: 1px solid #2563eb;
+            color: #2563eb;
+            background: white;
+        }
+
+        .invite-button {
+            border: none;
+            background: #2563eb;
+            color: white;
+        }
+
+        .invite-button:hover {
+            background: #1d4ed8;
+        }
+
+        .empty {
+            background: white;
+            padding: 50px;
+            border-radius: 18px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .empty-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 900px) {
+
+            .people-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .search-row {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .people-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .discover-header h1 {
+                font-size: 32px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ======================================
+     NAVBAR
+======================================= -->
+
+<nav style="
+    background:#111827;
+    padding:18px 5%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+">
+
+    <a
+        href="/dashboard"
+        style="
+            color:white;
+            font-size:25px;
+            font-weight:bold;
+            text-decoration:none;
+        "
+    >
+        Collab<span style="color:#60a5fa;">X</span>
+    </a>
+
+
+    <div>
+
+        <a
+            href="/profile"
+            style="
+                color:white;
+                margin-right:20px;
+                text-decoration:none;
+            "
+        >
+            My Profile
+        </a>
+
+
+        <a
+            href="/logout"
+            style="
+                color:white;
+                text-decoration:none;
+            "
+        >
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- ======================================
+     DISCOVER
+======================================= -->
+
+<div class="discover-page">
+
+
+    <div class="discover-header">
+
+        <h1>
+            🔎 Discover People
+        </h1>
+
+        <p>
+            Find creators, companies,
+            filmmakers, athletes and innovators
+            to collaborate with.
+        </p>
+
+    </div>
+
+
+    <!-- ==================================
+         SEARCH / FILTER
+    =================================== -->
+
+    <form
+        action="/discover"
+        method="GET"
+        class="search-box"
+    >
+
+        <div class="search-row">
+
+            <input
+                type="text"
+                name="search"
+                placeholder="Search people, skills, roles..."
+                value="{{ search }}"
+            >
+
+
+            <select name="role">
+
+                <option value="">
+                    All Roles
+                </option>
+
+                <option
+                    value="Company / Brand"
+                    {% if role == "Company / Brand" %}
+                    selected
+                    {% endif %}
+                >
+                    Company / Brand
+                </option>
+
+                <option
+                    value="YouTuber / Creator"
+                    {% if role == "YouTuber / Creator" %}
+                    selected
+                    {% endif %}
+                >
+                    YouTuber / Creator
+                </option>
+
+                <option
+                    value="Filmmaker"
+                    {% if role == "Filmmaker" %}
+                    selected
+                    {% endif %}
+                >
+                    Filmmaker
+                </option>
+
+                <option
+                    value="Athlete / Sports Player"
+                    {% if role == "Athlete / Sports Player" %}
+                    selected
+                    {% endif %}
+                >
+                    Athlete / Sports Player
+                </option>
+
+                <option
+                    value="Developer / Engineer"
+                    {% if role == "Developer / Engineer" %}
+                    selected
+                    {% endif %}
+                >
+                    Developer / Engineer
+                </option>
+
+                <option
+                    value="Designer / Artist"
+                    {% if role == "Designer / Artist" %}
+                    selected
+                    {% endif %}
+                >
+                    Designer / Artist
+                </option>
+
+                <option
+                    value="Musician"
+                    {% if role == "Musician" %}
+                    selected
+                    {% endif %}
+                >
+                    Musician
+                </option>
+
+                <option
+                    value="Startup / Founder"
+                    {% if role == "Startup / Founder" %}
+                    selected
+                    {% endif %}
+                >
+                    Startup / Founder
+                </option>
+
+            </select>
+
+
+            <input
+                type="text"
+                name="skills"
+                placeholder="Skills e.g. Python"
+                value="{{ skills }}"
+            >
+
+        </div>
+
+
+        <div class="search-row">
+
+            <input
+                type="text"
+                name="location"
+                placeholder="Location e.g. India"
+                value="{{ location }}"
+            >
+
+
+            <select name="availability">
+
+                <option value="">
+                    Any Availability
+                </option>
+
+                <option
+                    value="Available"
+                    {% if availability == "Available" %}
+                    selected
+                    {% endif %}
+                >
+                    Available
+                </option>
+
+                <option
+                    value="Busy"
+                    {% if availability == "Busy" %}
+                    selected
+                    {% endif %}
+                >
+                    Busy
+                </option>
+
+                <option
+                    value="Not Available"
+                    {% if availability == "Not Available" %}
+                    selected
+                    {% endif %}
+                >
+                    Not Available
+                </option>
+
+            </select>
+
+
+            <button
+                type="submit"
+                class="search-button"
+            >
+                🔎 Search
+            </button>
+
+        </div>
+
+    </form>
+
+
+    <!-- ==================================
+         RESULTS
+    =================================== -->
+
+    <div class="results-title">
+
+        <h2>
+            People you may want to collaborate with
+        </h2>
+
+        <p>
+            {{ users|length }} person(s) found
+        </p>
+
+    </div>
+
+
+    {% if users %}
+
+    <div class="people-grid">
+
+
+        {% for person in users %}
+
+
+        <div class="person-card">
+
+
+            <!-- PROFILE TOP -->
+
+            <div class="person-top">
+
+
+                {% if person.profile_picture %}
+
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename=person.profile_picture
+                    ) }}"
+                    class="profile-image"
+                    alt="Profile picture"
+                >
+
+                {% else %}
+
+                <div class="profile-placeholder">
+
+                    {{ person.first_name[0]|upper }}
+
+                </div>
+
+                {% endif %}
+
+
+                <div>
+
+                    <div class="person-name">
+
+                        {{ person.first_name }}
+                        {{ person.last_name }}
+
+                    </div>
+
+
+                    <div class="person-role">
+
+                        {{ person.role }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- BIO -->
+
+            {% if person.bio %}
+
+            <div class="bio">
+
+                {{ person.bio }}
+
+            </div>
+
+            {% else %}
+
+            <div class="bio">
+
+                No bio added yet.
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- LOCATION -->
+
+            {% if person.location %}
+
+            <div class="info">
+
+                📍 {{ person.location }}
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- AVAILABILITY -->
+
+            {% if person.availability %}
+
+            <div class="info">
+
+                🟢 {{ person.availability }}
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- SKILLS -->
+
+            {% if person.skills %}
+
+            <div class="skills">
+
+                {% for skill in person.skills.split(",") %}
+
+                <span class="skill">
+
+                    {{ skill.strip() }}
+
+                </span>
+
+                {% endfor %}
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- BUTTONS -->
+
+            <div class="card-buttons">
+
+
+                <a
+                    href="{{ url_for(
+                        'public_profile',
+                        user_id=person.id
+                    ) }}"
+                    class="view-button"
+                >
+                    View Profile
+                </a>
+
+
+                <form
+                    action="{{ url_for(
+                        'invite',
+                        user_id=person.id
+                    ) }}"
+                    method="POST"
+                    style="flex:1;"
+                >
+
+                    <button
+                        type="submit"
+                        class="invite-button"
+                        style="width:100%;"
+                    >
+                        🤝 Invite
+                    </button>
+
+                </form>
+
+
+            </div>
+
+
+        </div>
+
+
+        {% endfor %}
+
+
+    </div>
+
+
+    {% else %}
+
+
+    <!-- ==================================
+         NO RESULTS
+    =================================== -->
+
+    <div class="empty">
+
+        <div class="empty-icon">
+            🔍
+        </div>
+
+        <h2>
+            No collaborators found
+        </h2>
+
+        <p>
+            Try another search,
+            role or skill.
+        </p>
+
+    </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+</body>
+
+</html>

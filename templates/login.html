@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CollabX - Login</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- LEFT SIDE -->
+
+    <div class="left">
+
+        <div class="logo">
+            Collab<span>X</span>
+        </div>
+
+
+        <div class="hero">
+
+            <h1>
+                Welcome<br>
+                Back.
+            </h1>
+
+
+            <p>
+                Your next collaboration
+                could be one login away.
+
+                Connect with companies,
+                creators, filmmakers,
+                athletes, developers
+                and innovators.
+            </p>
+
+
+            <div class="tags">
+
+                <span>🎥 Creators</span>
+
+                <span>🎬 Filmmakers</span>
+
+                <span>🏏 Athletes</span>
+
+                <span>🤖 Engineers</span>
+
+                <span>🚀 Startups</span>
+
+            </div>
+
+        </div>
+
+
+        <p class="bottom">
+            Turn ideas into teams.
+        </p>
+
+    </div>
+
+
+
+    <!-- RIGHT SIDE -->
+
+    <div class="right">
+
+
+        <form
+            action="/login"
+            method="POST"
+        >
+
+
+            <h2>
+                Welcome back 👋
+            </h2>
+
+
+            <p class="subtitle">
+                Login to your CollabX account.
+            </p>
+
+
+
+            <!-- SUCCESS MESSAGE -->
+
+            {% if message %}
+
+            <div class="success">
+                {{ message }}
+            </div>
+
+            {% endif %}
+
+
+
+            <!-- ERROR MESSAGE -->
+
+            {% if error %}
+
+            <div class="error">
+                {{ error }}
+            </div>
+
+            {% endif %}
+
+
+
+            <!-- EMAIL -->
+
+            <label for="email">
+                Email Address
+            </label>
+
+
+            <input
+                id="email"
+                type="email"
+                name="email"
+                placeholder="you@example.com"
+                required
+            >
+
+
+
+            <!-- PASSWORD -->
+
+            <label for="password">
+                Password
+            </label>
+
+
+            <input
+                id="password"
+                type="password"
+                name="password"
+                placeholder="Enter your password"
+                minlength="8"
+                required
+            >
+
+
+
+            <!-- FORGOT PASSWORD -->
+
+            <div class="forgot">
+
+                <a href="#">
+                    Forgot password?
+                </a>
+
+            </div>
+
+
+
+            <!-- LOGIN BUTTON -->
+
+            <button type="submit">
+                Login →
+            </button>
+
+
+
+            <!-- CREATE ACCOUNT -->
+
+            <p class="login">
+
+                Don't have an account?
+
+                <a href="/">
+                    Create account
+                </a>
+
+            </p>
+
+
+        </form>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

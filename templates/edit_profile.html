@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Edit Profile - CollabX</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<nav class="navbar">
+
+    <div class="nav-logo">
+
+        Collab<span>X</span>
+
+    </div>
+
+
+    <div class="nav-links">
+
+        <a href="/dashboard">
+            Dashboard
+        </a>
+
+        <a href="/profile">
+            My Profile
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+
+<main class="profile-page">
+
+
+    <div class="profile-form">
+
+
+        <h1>
+            Edit Your Profile ✨
+        </h1>
+
+
+        <p class="subtitle">
+
+            Tell people who you are and
+            what kind of collaborations
+            you're looking for.
+
+        </p>
+
+
+        <form
+            action="/edit-profile"
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+
+            <!-- PROFILE PICTURE -->
+
+            <div class="picture-section">
+
+                {% if user["profile_picture"] %}
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename=user['profile_picture']
+                        ) }}"
+                        class="profile-picture"
+                    >
+
+                {% else %}
+
+                    <div class="profile-placeholder">
+                        {{ user["first_name"][0] }}
+                    </div>
+
+                {% endif %}
+
+
+                <div>
+
+                    <label>
+                        Profile Picture
+                    </label>
+
+                    <input
+                        type="file"
+                        name="profile_picture"
+                        accept="image/*"
+                    >
+
+                </div>
+
+            </div>
+
+
+
+            <!-- BIO -->
+
+            <label>
+                Bio
+            </label>
+
+            <textarea
+                name="bio"
+                rows="5"
+                placeholder="Tell people about yourself..."
+            >{{ user["bio"] or "" }}</textarea>
+
+
+
+            <!-- LOCATION -->
+
+            <label>
+                Location
+            </label>
+
+            <input
+                type="text"
+                name="location"
+                value="{{ user['location'] or '' }}"
+                placeholder="India"
+            >
+
+
+
+            <!-- SKILLS -->
+
+            <label>
+                Skills
+            </label>
+
+            <input
+                type="text"
+                name="skills"
+                value="{{ user['skills'] or '' }}"
+                placeholder="Python, AI/ML, Robotics, Arduino"
+            >
+
+            <small>
+                Separate skills using commas.
+            </small>
+
+
+
+            <!-- LOOKING FOR -->
+
+            <label>
+                Looking For
+            </label>
+
+            <input
+                type="text"
+                name="looking_for"
+                value="{{ user['looking_for'] or '' }}"
+                placeholder="Robotics projects, startups, YouTube collaborations"
+            >
+
+
+
+            <!-- AVAILABILITY -->
+
+            <label>
+                Availability
+            </label>
+
+            <select name="availability">
+
+                <option
+                    value=""
+                    {% if not user["availability"] %}
+                    selected
+                    {% endif %}
+                >
+                    Select availability
+                </option>
+
+
+                <option
+                    value="Available"
+                    {% if user["availability"] == "Available" %}
+                    selected
+                    {% endif %}
+                >
+                    🟢 Available
+                </option>
+
+
+                <option
+                    value="Busy"
+                    {% if user["availability"] == "Busy" %}
+                    selected
+                    {% endif %}
+                >
+                    🟡 Busy
+                </option>
+
+
+                <option
+                    value="Not Available"
+                    {% if user["availability"] == "Not Available" %}
+                    selected
+                    {% endif %}
+                >
+                    🔴 Not Available
+                </option>
+
+            </select>
+
+
+
+            <!-- SOCIAL LINKS -->
+
+            <h2 class="section-title">
+                Social Links 🔗
+            </h2>
+
+
+            <label>
+                GitHub
+            </label>
+
+            <input
+                type="url"
+                name="github"
+                value="{{ user['github'] or '' }}"
+                placeholder="https://github.com/username"
+            >
+
+
+            <label>
+                LinkedIn
+            </label>
+
+            <input
+                type="url"
+                name="linkedin"
+                value="{{ user['linkedin'] or '' }}"
+                placeholder="https://linkedin.com/in/username"
+            >
+
+
+            <label>
+                YouTube
+            </label>
+
+            <input
+                type="url"
+                name="youtube"
+                value="{{ user['youtube'] or '' }}"
+                placeholder="https://youtube.com/@username"
+            >
+
+
+            <label>
+                Portfolio
+            </label>
+
+            <input
+                type="url"
+                name="portfolio"
+                value="{{ user['portfolio'] or '' }}"
+                placeholder="https://yourportfolio.com"
+            >
+
+
+
+            <!-- BUTTONS -->
+
+            <div class="form-buttons">
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Save Profile 🚀
+                </button>
+
+
+                <a
+                    href="/dashboard"
+                    class="secondary-button"
+                >
+                    Cancel
+                </a>
+
+            </div>
+
+
+        </form>
+
+
+    </div>
+
+
+</main>
+
+
+</body>
+
+</html>

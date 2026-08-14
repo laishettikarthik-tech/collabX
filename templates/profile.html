@@ -1,0 +1,316 @@
+`<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {{ user["first_name"] }} {{ user["last_name"] }}
+        - CollabX
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<nav class="navbar">
+
+    <div class="nav-logo">
+
+        Collab<span>X</span>
+
+    </div>
+
+
+    <div class="nav-links">
+
+        <a href="/dashboard">
+            Dashboard
+        </a>
+
+        <a href="/profile">
+            My Profile
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+
+<main class="profile-page">
+
+
+    <div class="public-profile">
+
+
+        <!-- PROFILE HEADER -->
+
+        <div class="profile-header">
+
+
+            {% if user["profile_picture"] %}
+
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename=user['profile_picture']
+                    ) }}"
+                    class="large-profile-picture"
+                >
+
+            {% else %}
+
+                <div class="large-profile-placeholder">
+
+                    {{ user["first_name"][0] }}
+
+                </div>
+
+            {% endif %}
+
+
+
+            <div>
+
+                <h1>
+
+                    {{ user["first_name"] }}
+                    {{ user["last_name"] }}
+
+                </h1>
+
+
+                <p class="role">
+
+                    {{ user["role"] }}
+
+                </p>
+
+
+                {% if user["location"] %}
+
+                <p class="location">
+
+                    📍 {{ user["location"] }}
+
+                </p>
+
+                {% endif %}
+
+
+                {% if user["availability"] == "Available" %}
+
+                <span class="available">
+
+                    🟢 Available for collaboration
+
+                </span>
+
+                {% elif user["availability"] == "Busy" %}
+
+                <span class="busy">
+
+                    🟡 Currently busy
+
+                </span>
+
+                {% elif user["availability"] == "Not Available" %}
+
+                <span class="not-available">
+
+                    🔴 Not available
+
+                </span>
+
+                {% endif %}
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- BIO -->
+
+        {% if user["bio"] %}
+
+        <section class="profile-section">
+
+            <h2>
+                About
+            </h2>
+
+            <p>
+                {{ user["bio"] }}
+            </p>
+
+        </section>
+
+        {% endif %}
+
+
+
+        <!-- SKILLS -->
+
+        {% if user["skills"] %}
+
+        <section class="profile-section">
+
+            <h2>
+                Skills
+            </h2>
+
+
+            <div class="skill-list">
+
+                {% for skill in user["skills"].split(",") %}
+
+                <span class="skill">
+
+                    {{ skill.strip() }}
+
+                </span>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+
+        <!-- LOOKING FOR -->
+
+        {% if user["looking_for"] %}
+
+        <section class="profile-section">
+
+            <h2>
+                Looking For
+            </h2>
+
+
+            <p>
+
+                {{ user["looking_for"] }}
+
+            </p>
+
+        </section>
+
+        {% endif %}
+
+
+
+        <!-- SOCIAL LINKS -->
+
+        <section class="profile-section">
+
+            <h2>
+                Connect
+            </h2>
+
+
+            <div class="social-links">
+
+
+                {% if user["github"] %}
+
+                <a
+                    href="{{ user['github'] }}"
+                    target="_blank"
+                >
+                    GitHub
+                </a>
+
+                {% endif %}
+
+
+                {% if user["linkedin"] %}
+
+                <a
+                    href="{{ user['linkedin'] }}"
+                    target="_blank"
+                >
+                    LinkedIn
+                </a>
+
+                {% endif %}
+
+
+                {% if user["youtube"] %}
+
+                <a
+                    href="{{ user['youtube'] }}"
+                    target="_blank"
+                >
+                    YouTube
+                </a>
+
+                {% endif %}
+
+
+                {% if user["portfolio"] %}
+
+                <a
+                    href="{{ user['portfolio'] }}"
+                    target="_blank"
+                >
+                    Portfolio
+                </a>
+
+                {% endif %}
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- COLLABORATE BUTTON -->
+
+        {% if session["user_id"] != user["id"] %}
+
+        <button
+            class="primary-button"
+            onclick="alert('Collaboration invitations will be added in Phase 3!')"
+        >
+
+            🤝 Invite to Collaborate
+
+        </button>
+
+        {% endif %}
+
+
+    </div>
+
+
+</main>
+
+
+</body>
+
+</html>

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CollabX - Sign Up</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- ================================= -->
+    <!-- LEFT SIDE -->
+    <!-- ================================= -->
+
+    <div class="left">
+
+
+        <div class="logo">
+
+            Collab<span>X</span>
+
+        </div>
+
+
+        <div class="hero">
+
+
+            <h1>
+
+                Build.<br>
+                Connect.<br>
+                Collaborate.
+
+            </h1>
+
+
+            <p>
+
+                Connect companies, creators,
+                YouTubers, filmmakers, athletes,
+                developers and talented people
+                to build amazing projects together.
+
+            </p>
+
+
+            <div class="tags">
+
+                <span>🎥 YouTubers</span>
+
+                <span>🎬 Filmmakers</span>
+
+                <span>🏏 Athletes</span>
+
+                <span>🎨 Creators</span>
+
+                <span>🤖 Engineers</span>
+
+                <span>🚀 Startups</span>
+
+            </div>
+
+
+        </div>
+
+
+        <p class="bottom">
+
+            Turn ideas into teams.
+
+        </p>
+
+
+    </div>
+
+
+
+    <!-- ================================= -->
+    <!-- RIGHT SIDE - SIGNUP FORM -->
+    <!-- ================================= -->
+
+    <div class="right">
+
+
+        <!-- IMPORTANT -->
+
+        <!-- This sends the form to Python -->
+
+        <form
+            action="/signup"
+            method="POST"
+        >
+
+
+            <h2>
+
+                Create your account
+
+            </h2>
+
+
+            <p class="subtitle">
+
+                Join CollabX and find your
+                next collaboration.
+
+            </p>
+
+
+
+            <!-- ================================= -->
+            <!-- FIRST + LAST NAME -->
+            <!-- ================================= -->
+
+            <div class="row">
+
+
+                <div>
+
+                    <label>
+
+                        First Name
+
+                    </label>
+
+
+                    <input
+                        type="text"
+                        name="first_name"
+                        placeholder="Karthik"
+                        required
+                    >
+
+                </div>
+
+
+
+                <div>
+
+                    <label>
+
+                        Last Name
+
+                    </label>
+
+
+                    <input
+                        type="text"
+                        name="last_name"
+                        placeholder="Laishetti"
+                        required
+                    >
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ================================= -->
+            <!-- EMAIL -->
+            <!-- ================================= -->
+
+            <label>
+
+                Email Address
+
+            </label>
+
+
+            <input
+                type="email"
+                name="email"
+                placeholder="you@example.com"
+                required
+            >
+
+
+
+            <!-- ================================= -->
+            <!-- ROLE -->
+            <!-- ================================= -->
+
+            <label>
+
+                I am joining as
+
+            </label>
+
+
+            <select
+                name="role"
+                required
+            >
+
+
+                <option value="">
+
+                    Select your role
+
+                </option>
+
+
+                <option>
+
+                    Company / Brand
+
+                </option>
+
+
+                <option>
+
+                    YouTuber / Creator
+
+                </option>
+
+
+                <option>
+
+                    Filmmaker
+
+                </option>
+
+
+                <option>
+
+                    Athlete / Sports Player
+
+                </option>
+
+
+                <option>
+
+                    Developer / Engineer
+
+                </option>
+
+
+                <option>
+
+                    Designer / Artist
+
+                </option>
+
+
+                <option>
+
+                    Musician
+
+                </option>
+
+
+                <option>
+
+                    Startup / Founder
+
+                </option>
+
+
+                <option>
+
+                    Other
+
+                </option>
+
+
+            </select>
+
+
+
+            <!-- ================================= -->
+            <!-- PASSWORD -->
+            <!-- ================================= -->
+
+            <label>
+
+                Password
+
+            </label>
+
+
+            <input
+                type="password"
+                name="password"
+                placeholder="Create a strong password"
+                minlength="8"
+                required
+            >
+
+
+
+            <!-- ================================= -->
+            <!-- TERMS -->
+            <!-- ================================= -->
+
+            <div class="terms">
+
+
+                <input
+                    type="checkbox"
+                    required
+                >
+
+
+                <p>
+
+                    I agree to the
+
+                    <a href="#">
+
+                        Terms of Service
+
+                    </a>
+
+                    and
+
+                    <a href="#">
+
+                        Privacy Policy
+
+                    </a>
+
+                </p>
+
+
+            </div>
+
+
+
+            <!-- ================================= -->
+            <!-- SUBMIT BUTTON -->
+            <!-- ================================= -->
+
+            <button type="submit">
+
+                Create Account →
+
+            </button>
+
+
+
+            <!-- ================================= -->
+            <!-- ERROR MESSAGE -->
+            <!-- ================================= -->
+
+            {% if error %}
+
+            <div class="error">
+
+                {{ error }}
+
+            </div>
+
+            {% endif %}
+
+
+
+            <!-- ================================= -->
+            <!-- LOGIN -->
+            <!-- ================================= -->
+
+            <p class="login">
+
+                Already have an account?
+
+                <a href="/login">
+
+                    Log in
+
+                </a>
+
+            </p>
+
+
+        </form>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>
