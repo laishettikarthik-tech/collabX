@@ -40,6 +40,34 @@
             font-size: 17px;
         }
 
+        /* =====================================
+           MESSAGE
+        ===================================== */
+
+        .invite-message {
+            background: #dcfce7;
+            color: #166534;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .invite-error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* =====================================
+           SEARCH
+        ===================================== */
+
         .search-box {
             background: white;
             padding: 25px;
@@ -81,6 +109,10 @@
             background: #1d4ed8;
         }
 
+        /* =====================================
+           RESULTS
+        ===================================== */
+
         .results-title {
             margin-bottom: 20px;
         }
@@ -95,11 +127,13 @@
 
         .people-grid {
             display: grid;
-            grid-template-columns:
-                repeat(3, 1fr);
-
+            grid-template-columns: repeat(3, 1fr);
             gap: 22px;
         }
+
+        /* =====================================
+           PERSON CARD
+        ===================================== */
 
         .person-card {
             background: white;
@@ -161,6 +195,10 @@
             font-size: 14px;
         }
 
+        /* =====================================
+           SKILLS
+        ===================================== */
+
         .skills {
             display: flex;
             flex-wrap: wrap;
@@ -175,6 +213,10 @@
             border-radius: 20px;
             font-size: 12px;
         }
+
+        /* =====================================
+           BUTTONS
+        ===================================== */
 
         .card-buttons {
             display: flex;
@@ -191,12 +233,17 @@
             text-decoration: none;
             font-weight: bold;
             cursor: pointer;
+            box-sizing: border-box;
         }
 
         .view-button {
             border: 1px solid #2563eb;
             color: #2563eb;
             background: white;
+        }
+
+        .view-button:hover {
+            background: #eff6ff;
         }
 
         .invite-button {
@@ -208,6 +255,10 @@
         .invite-button:hover {
             background: #1d4ed8;
         }
+
+        /* =====================================
+           EMPTY
+        ===================================== */
 
         .empty {
             background: white;
@@ -222,11 +273,14 @@
             margin-bottom: 15px;
         }
 
+        /* =====================================
+           MOBILE
+        ===================================== */
+
         @media (max-width: 900px) {
 
             .people-grid {
-                grid-template-columns:
-                    repeat(2, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .search-row {
@@ -283,6 +337,28 @@
     <div>
 
         <a
+            href="/dashboard"
+            style="
+                color:white;
+                margin-right:20px;
+                text-decoration:none;
+            "
+        >
+            🏠 Dashboard
+        </a>
+
+        <a
+            href="/invitations"
+            style="
+                color:white;
+                margin-right:20px;
+                text-decoration:none;
+            "
+        >
+            📨 Invitations
+        </a>
+
+        <a
             href="/profile"
             style="
                 color:white;
@@ -290,7 +366,7 @@
                 text-decoration:none;
             "
         >
-            My Profile
+            👤 My Profile
         </a>
 
 
@@ -301,7 +377,7 @@
                 text-decoration:none;
             "
         >
-            Logout
+            🚪 Logout
         </a>
 
     </div>
@@ -329,6 +405,32 @@
         </p>
 
     </div>
+
+
+    <!-- ==================================
+         INVITATION MESSAGE
+    =================================== -->
+
+    {% if request.args.get("invited") %}
+
+    <div class="invite-message">
+
+        ✅ Collaboration invitation sent successfully!
+
+    </div>
+
+    {% endif %}
+
+
+    {% if request.args.get("message") %}
+
+    <div class="invite-message">
+
+        {{ request.args.get("message") }}
+
+    </div>
+
+    {% endif %}
 
 
     <!-- ==================================
@@ -427,6 +529,15 @@
                     {% endif %}
                 >
                     Startup / Founder
+                </option>
+
+                <option
+                    value="Other"
+                    {% if role == "Other" %}
+                    selected
+                    {% endif %}
+                >
+                    Other
                 </option>
 
             </select>
@@ -644,7 +755,9 @@
             {% endif %}
 
 
-            <!-- BUTTONS -->
+            <!-- ==================================
+                 BUTTONS
+            =================================== -->
 
             <div class="card-buttons">
 
@@ -656,9 +769,11 @@
                     ) }}"
                     class="view-button"
                 >
-                    View Profile
+                    👤 View Profile
                 </a>
 
+
+                <!-- REAL INVITATION FORM -->
 
                 <form
                     action="{{ url_for(
@@ -666,13 +781,12 @@
                         user_id=person.id
                     ) }}"
                     method="POST"
-                    style="flex:1;"
+                    style="flex:1; margin:0;"
                 >
 
                     <button
                         type="submit"
                         class="invite-button"
-                        style="width:100%;"
                     >
                         🤝 Invite
                     </button>

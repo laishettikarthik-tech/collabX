@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        My Collaborations - CollabX
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+    <style>
+
+        body {
+            background: #f8fafc;
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            margin-bottom: 35px;
+        }
+
+        .header h1 {
+            font-size: 38px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #64748b;
+        }
+
+        .collaborations-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 22px;
+        }
+
+        .collaboration-card {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+
+            box-shadow:
+                0 8px 25px
+                rgba(0, 0, 0, 0.07);
+        }
+
+        .person {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+
+            margin-bottom: 20px;
+        }
+
+        .profile-picture {
+            width: 70px;
+            height: 70px;
+
+            border-radius: 50%;
+
+            object-fit: cover;
+
+            background: #e2e8f0;
+        }
+
+        .placeholder {
+            width: 70px;
+            height: 70px;
+
+            border-radius: 50%;
+
+            background: #2563eb;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 27px;
+            font-weight: bold;
+        }
+
+        .name {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .role {
+            color: #2563eb;
+            font-size: 14px;
+
+            margin-top: 5px;
+        }
+
+        .bio {
+            color: #64748b;
+            line-height: 1.6;
+
+            margin-bottom: 15px;
+        }
+
+        .location {
+            color: #475569;
+            font-size: 14px;
+
+            margin-bottom: 20px;
+        }
+
+        .status {
+            display: inline-block;
+
+            padding: 6px 12px;
+
+            border-radius: 20px;
+
+            background: #dcfce7;
+            color: #166534;
+
+            font-size: 13px;
+            font-weight: bold;
+
+            margin-bottom: 18px;
+        }
+
+        .view-button {
+            display: block;
+
+            text-align: center;
+
+            padding: 12px;
+
+            border-radius: 9px;
+
+            background: #2563eb;
+            color: white;
+
+            text-decoration: none;
+
+            font-weight: bold;
+        }
+
+        .view-button:hover {
+            background: #1d4ed8;
+        }
+
+        .empty {
+            background: white;
+
+            padding: 55px 25px;
+
+            border-radius: 18px;
+
+            text-align: center;
+
+            color: #64748b;
+        }
+
+        .empty-icon {
+            font-size: 55px;
+
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 900px) {
+
+            .collaborations-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .collaborations-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 30px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ======================================
+     NAVIGATION
+======================================= -->
+
+<nav class="dashboard-nav">
+
+    <div class="nav-logo">
+
+        Collab<span>X</span>
+
+    </div>
+
+
+    <div class="nav-links">
+
+        <a href="/dashboard">
+            🏠 Dashboard
+        </a>
+
+        <a href="/discover">
+            🔎 Discover
+        </a>
+
+        <a href="/invitations">
+            📨 Invitations
+        </a>
+
+        <a href="/collaborations">
+            🤝 Collaborations
+        </a>
+
+        <a href="/profile">
+            👤 My Profile
+        </a>
+
+        <a href="/logout">
+            🚪 Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- ======================================
+     MAIN PAGE
+======================================= -->
+
+<div class="page">
+
+
+    <div class="header">
+
+        <h1>
+            🤝 My Collaborations
+        </h1>
+
+        <p>
+            People you have connected with
+            through CollabX.
+        </p>
+
+    </div>
+
+
+    {% if collaborations %}
+
+
+    <div class="collaborations-grid">
+
+
+        {% for person in collaborations %}
+
+
+        <div class="collaboration-card">
+
+
+            <!-- PROFILE -->
+
+            <div class="person">
+
+
+                {% if person.collaborator_picture %}
+
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename=person.collaborator_picture
+                    ) }}"
+                    class="profile-picture"
+                    alt="Profile picture"
+                >
+
+                {% else %}
+
+                <div class="placeholder">
+
+                    {{ person.collaborator_first_name[0]|upper }}
+
+                </div>
+
+                {% endif %}
+
+
+                <div>
+
+                    <div class="name">
+
+                        {{ person.collaborator_first_name }}
+                        {{ person.collaborator_last_name }}
+
+                    </div>
+
+
+                    <div class="role">
+
+                        {{ person.collaborator_role }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <span class="status">
+
+                ✓ Connected
+
+            </span>
+
+
+            <!-- BIO -->
+
+            {% if person.collaborator_bio %}
+
+            <div class="bio">
+
+                {{ person.collaborator_bio }}
+
+            </div>
+
+            {% else %}
+
+            <div class="bio">
+
+                No bio available.
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- LOCATION -->
+
+            {% if person.collaborator_location %}
+
+            <div class="location">
+
+                📍 {{ person.collaborator_location }}
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- VIEW PROFILE -->
+
+            <div style="
+    display:flex;
+    gap:10px;
+">
+
+    <a
+        href="{{ url_for(
+            'public_profile',
+            user_id=person.collaborator_id
+        ) }}"
+        class="view-button"
+        style="flex:1;"
+    >
+        👤 Profile
+    </a>
+
+
+    <a
+        href="{{ url_for(
+            'chat',
+            user_id=person.collaborator_id
+        ) }}"
+        class="view-button"
+        style="flex:1;"
+    >
+        💬 Message
+    </a>
+
+</div>
+
+        </div>
+
+
+        {% endfor %}
+
+
+    </div>
+
+
+    {% else %}
+
+
+    <!-- ==================================
+         EMPTY STATE
+    =================================== -->
+
+    <div class="empty">
+
+        <div class="empty-icon">
+            🤝
+        </div>
+
+
+        <h2>
+            No collaborations yet
+        </h2>
+
+
+        <p>
+
+            Discover people, send collaboration
+            invitations and start building
+            your network.
+
+        </p>
+
+
+        <br>
+
+
+        <a
+            href="/discover"
+            class="view-button"
+            style="
+                max-width:220px;
+                margin:auto;
+            "
+        >
+
+            🔎 Discover People
+
+        </a>
+
+    </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+</body>
+
+</html>

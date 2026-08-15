@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Chat with {{ other_user["first_name"] }} - CollabX
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+        }
+
+        .chat-navbar {
+            background: #111827;
+            color: white;
+            padding: 16px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-logo {
+            color: white;
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .chat-logo span {
+            color: #60a5fa;
+        }
+
+        .chat-nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .chat-nav-links a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .chat-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .chat-avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #2563eb;
+        }
+
+        .chat-placeholder {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: #2563eb;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .chat-header h2 {
+            margin: 0;
+        }
+
+        .chat-role {
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        .messages {
+            height: 500px;
+            overflow-y: auto;
+            padding: 25px;
+            background: #f8fafc;
+        }
+
+        .message-row {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .message-row.mine {
+            justify-content: flex-end;
+        }
+
+        .message {
+            max-width: 65%;
+            padding: 12px 16px;
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+
+        .message-row.mine .message {
+            background: #2563eb;
+            color: white;
+        }
+
+        .message-name {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            opacity: 0.7;
+        }
+
+        .message-text {
+            font-size: 15px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message-time {
+            font-size: 10px;
+            margin-top: 6px;
+            opacity: 0.6;
+        }
+
+        .empty-chat {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .empty-chat div {
+            font-size: 50px;
+        }
+
+        .chat-form {
+            display: flex;
+            gap: 10px;
+            padding: 18px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 14px 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: #2563eb;
+        }
+
+        .send-button {
+            border: none;
+            background: #2563eb;
+            color: white;
+            padding: 0 25px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .send-button:hover {
+            background: #1d4ed8;
+        }
+
+        @media (max-width: 600px) {
+
+            .chat-container {
+                margin: 15px;
+            }
+
+            .messages {
+                height: 450px;
+            }
+
+            .chat-nav-links {
+                gap: 8px;
+            }
+
+            .chat-nav-links a {
+                font-size: 13px;
+            }
+
+            .message {
+                max-width: 80%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- NAVBAR -->
+
+<nav class="chat-navbar">
+
+    <a
+        href="{{ url_for('dashboard') }}"
+        class="chat-logo"
+    >
+        Collab<span>X</span>
+    </a>
+
+    <div class="chat-nav-links">
+
+        <a href="{{ url_for('dashboard') }}">
+            🏠 Dashboard
+        </a>
+
+        <a href="{{ url_for('invitations') }}">
+            📨 Invitations
+        </a>
+
+        <a href="{{ url_for('profile') }}">
+            👤 Profile
+        </a>
+
+        <a href="{{ url_for('logout') }}">
+            🚪 Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- CHAT -->
+
+<div class="chat-container">
+
+
+    <!-- CHAT HEADER -->
+
+    <div class="chat-header">
+
+        {% if other_user["profile_picture"] %}
+
+            <img
+                src="{{ url_for(
+                    'static',
+                    filename=other_user['profile_picture']
+                ) }}"
+                class="chat-avatar"
+                alt="Profile picture"
+            >
+
+        {% else %}
+
+            <div class="chat-placeholder">
+
+                {{ other_user["first_name"][0]|upper }}
+
+            </div>
+
+        {% endif %}
+
+
+        <div>
+
+            <h2>
+
+                {{ other_user["first_name"] }}
+                {{ other_user["last_name"] }}
+
+            </h2>
+
+            <div class="chat-role">
+
+                {{ other_user["role"] }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- MESSAGES -->
+
+    <div class="messages" id="messages">
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div
+                    class="message-row
+                    {% if message['sender_id'] == session['user_id'] %}
+                        mine
+                    {% endif %}"
+                >
+
+                    <div class="message">
+
+                        <div class="message-name">
+
+                            {% if message["sender_id"] == session["user_id"] %}
+                                You
+                            {% else %}
+                                {{ message["first_name"] }}
+                            {% endif %}
+
+                        </div>
+
+                        <div class="message-text">
+
+                            {{ message["message"] }}
+
+                        </div>
+
+                        <div class="message-time">
+
+                            {{ message["created_at"] }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-chat">
+
+                <div>
+
+                    💬
+
+                    <h3>
+                        Start the conversation
+                    </h3>
+
+                    <p>
+                        Send your first message to
+                        {{ other_user["first_name"] }}.
+                    </p>
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- MESSAGE INPUT -->
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'chat',
+            user_id=other_user['id']
+        ) }}"
+        class="chat-form"
+    >
+
+        <input
+            type="text"
+            name="message"
+            class="chat-input"
+            placeholder="Type your message..."
+            autocomplete="off"
+            required
+        >
+
+        <button
+            type="submit"
+            class="send-button"
+        >
+            Send 🚀
+        </button>
+
+    </form>
+
+
+</div>
+
+
+<script>
+
+    const messages = document.getElementById("messages");
+
+    if (messages) {
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+</script>
+
+
+</body>
+
+</html>

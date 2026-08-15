@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Invitations - CollabX</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+    <style>
+
+        body {
+            background: #f8fafc;
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            margin-bottom: 35px;
+        }
+
+        .header h1 {
+            font-size: 38px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #64748b;
+        }
+
+        .section {
+            margin-bottom: 45px;
+        }
+
+        .section h2 {
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 18px;
+
+            box-shadow:
+                0 8px 25px
+                rgba(0, 0, 0, 0.07);
+        }
+
+        .person {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-picture {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #e2e8f0;
+        }
+
+        .placeholder {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+
+            background: #2563eb;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .name {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .role {
+            color: #2563eb;
+            margin-top: 4px;
+        }
+
+        .message {
+            margin: 20px 0;
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .buttons form {
+            flex: 1;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 9px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .accept {
+            background: #16a34a;
+            color: white;
+        }
+
+        .reject {
+            background: #ef4444;
+            color: white;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .accepted {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .empty {
+            background: white;
+            padding: 40px;
+            border-radius: 18px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .empty-icon {
+            font-size: 45px;
+            margin-bottom: 10px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ======================================
+     NAVBAR
+======================================= -->
+
+<nav style="
+    background:#111827;
+    padding:18px 5%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+">
+
+    <a
+        href="/dashboard"
+        style="
+            color:white;
+            font-size:25px;
+            font-weight:bold;
+            text-decoration:none;
+        "
+    >
+        Collab<span style="color:#60a5fa;">X</span>
+    </a>
+
+
+    <div>
+
+        <a
+            href="/discover"
+            style="
+                color:white;
+                margin-right:20px;
+                text-decoration:none;
+            "
+        >
+            Discover
+        </a>
+
+
+        <a
+            href="/profile"
+            style="
+                color:white;
+                margin-right:20px;
+                text-decoration:none;
+            "
+        >
+            Profile
+        </a>
+
+
+        <a
+            href="/logout"
+            style="
+                color:white;
+                text-decoration:none;
+            "
+        >
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<div class="page">
+
+
+    <!-- ==================================
+         HEADER
+    =================================== -->
+
+    <div class="header">
+
+        <h1>
+            📨 Collaboration Invitations
+        </h1>
+
+        <p>
+            Manage your collaboration requests.
+        </p>
+
+    </div>
+
+
+    <!-- ==================================
+         INCOMING
+    =================================== -->
+
+    <div class="section">
+
+        <h2>
+            📥 Incoming Requests
+        </h2>
+
+
+        {% if incoming %}
+
+
+            {% for invitation in incoming %}
+
+
+            <div class="card">
+
+                <div class="person">
+
+
+                    {% if invitation.sender_picture %}
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename=invitation.sender_picture
+                        ) }}"
+                        class="profile-picture"
+                        alt="Profile"
+                    >
+
+                    {% else %}
+
+                    <div class="placeholder">
+
+                        {{ invitation.sender_first_name[0]|upper }}
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <div>
+
+                        <div class="name">
+
+                            {{ invitation.sender_first_name }}
+                            {{ invitation.sender_last_name }}
+
+                        </div>
+
+
+                        <div class="role">
+
+                            {{ invitation.sender_role }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {% if invitation.message %}
+
+                <div class="message">
+
+                    💬 "{{ invitation.message }}"
+
+                </div>
+
+                {% endif %}
+
+
+                {% if invitation.status == "pending" %}
+
+                <div class="buttons">
+
+
+                    <form
+                        action="{{ url_for(
+                            'accept_invitation',
+                            invitation_id=invitation.id
+                        ) }}"
+                        method="POST"
+                    >
+
+                        <button
+                            class="accept"
+                            type="submit"
+                        >
+                            ✅ Accept
+                        </button>
+
+                    </form>
+
+
+                    <form
+                        action="{{ url_for(
+                            'reject_invitation',
+                            invitation_id=invitation.id
+                        ) }}"
+                        method="POST"
+                    >
+
+                        <button
+                            class="reject"
+                            type="submit"
+                        >
+                            ❌ Reject
+                        </button>
+
+                    </form>
+
+
+                </div>
+
+                {% else %}
+
+                <span
+                    class="status {{ invitation.status }}"
+                >
+                    {{ invitation.status|capitalize }}
+                </span>
+
+                {% endif %}
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        {% else %}
+
+
+            <div class="empty">
+
+                <div class="empty-icon">
+                    📭
+                </div>
+
+                <h3>
+                    No incoming invitations
+                </h3>
+
+                <p>
+                    When someone wants to collaborate
+                    with you, their request will appear here.
+                </p>
+
+            </div>
+
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ==================================
+         OUTGOING
+    =================================== -->
+
+    <div class="section">
+
+        <h2>
+            📤 Sent Invitations
+        </h2>
+
+
+        {% if outgoing %}
+
+
+            {% for invitation in outgoing %}
+
+
+            <div class="card">
+
+                <div class="person">
+
+
+                    {% if invitation.receiver_picture %}
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename=invitation.receiver_picture
+                        ) }}"
+                        class="profile-picture"
+                        alt="Profile"
+                    >
+
+                    {% else %}
+
+                    <div class="placeholder">
+
+                        {{ invitation.receiver_first_name[0]|upper }}
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <div>
+
+                        <div class="name">
+
+                            {{ invitation.receiver_first_name }}
+                            {{ invitation.receiver_last_name }}
+
+                        </div>
+
+
+                        <div class="role">
+
+                            {{ invitation.receiver_role }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {% if invitation.message %}
+
+                <div class="message">
+
+                    💬 "{{ invitation.message }}"
+
+                </div>
+
+                {% endif %}
+
+
+                <span
+                    class="status {{ invitation.status }}"
+                >
+                    {{ invitation.status|capitalize }}
+                </span>
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        {% else %}
+
+
+            <div class="empty">
+
+                <div class="empty-icon">
+                    📤
+                </div>
+
+                <h3>
+                    No sent invitations
+                </h3>
+
+                <p>
+                    Invitations you send will appear here.
+                </p>
+
+            </div>
+
+
+        {% endif %}
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

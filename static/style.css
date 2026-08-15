@@ -1176,3 +1176,110 @@ button:hover {
     }
 
 }
+
+/* ==========================================
+   DASHBOARD NAVIGATION
+========================================== */
+
+.dashboard-nav {
+    background: #111827;
+    padding: 18px 5%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+.nav-logo {
+    color: white;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.nav-logo span {
+    color: #60a5fa;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.nav-links a:hover {
+    color: #60a5fa;
+}
+
+
+/* ==========================================
+   DASHBOARD CARDS
+========================================== */
+
+.dashboard-card {
+    display: block;
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 18px;
+
+    text-decoration: none;
+    color: inherit;
+
+    box-shadow:
+        0 8px 25px
+        rgba(0, 0, 0, 0.07);
+
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+
+    box-shadow:
+        0 15px 35px
+        rgba(0, 0, 0, 0.12);
+}
+
+.dashboard-card h2 {
+    color: #111827;
+}
+
+.dashboard-card p {
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.card-icon {
+    font-size: 35px;
+    margin-bottom: 15px;
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 800px) {
+
+    .dashboard-nav {
+        flex-direction: column;
+    }
+
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+}

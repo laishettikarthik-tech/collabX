@@ -166,8 +166,35 @@ def create_database():
 
             message TEXT,
 
-            status TEXT
-            DEFAULT 'pending',
+            status TEXT DEFAULT 'pending',
+
+            created_at TIMESTAMP
+            DEFAULT CURRENT_TIMESTAMP,
+
+            FOREIGN KEY (sender_id)
+            REFERENCES users(id),
+
+            FOREIGN KEY (receiver_id)
+            REFERENCES users(id)
+
+        )
+    """)
+
+
+    # ======================================
+    # MESSAGES TABLE
+    # ======================================
+
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS messages (
+
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            sender_id INTEGER NOT NULL,
+
+            receiver_id INTEGER NOT NULL,
+
+            message TEXT NOT NULL,
 
             created_at TIMESTAMP
             DEFAULT CURRENT_TIMESTAMP,
@@ -214,24 +241,20 @@ def signup():
         ""
     ).strip()
 
-
     last_name = request.form.get(
         "last_name",
         ""
     ).strip()
-
 
     email = request.form.get(
         "email",
         ""
     ).lower().strip()
 
-
     role = request.form.get(
         "role",
         ""
     ).strip()
-
 
     password = request.form.get(
         "password",
@@ -297,10 +320,6 @@ def signup():
 
     try:
 
-        # ==================================
-        # CREATE USER
-        # ==================================
-
         cursor = connection.execute("""
             INSERT INTO users
             (
@@ -325,9 +344,7 @@ def signup():
         user_id = cursor.lastrowid
 
 
-        # ==================================
-        # CREATE EMPTY PROFILE
-        # ==================================
+        # Create empty profile
 
         connection.execute("""
             INSERT INTO profiles
@@ -379,7 +396,6 @@ def login():
             ""
         ).lower().strip()
 
-
         password = request.form.get(
             "password",
             ""
@@ -392,6 +408,7 @@ def login():
         user = connection.execute("""
             SELECT *
             FROM users
+
             WHERE email = ?
 
         """, (
@@ -402,10 +419,6 @@ def login():
         connection.close()
 
 
-        # ==================================
-        # USER NOT FOUND
-        # ==================================
-
         if user is None:
 
             return render_template(
@@ -413,10 +426,6 @@ def login():
                 error="Email or password is incorrect."
             )
 
-
-        # ==================================
-        # CHECK PASSWORD
-        # ==================================
 
         if not check_password_hash(
             user["password"],
@@ -520,13 +529,8 @@ def edit_profile():
 
     user_id = session["user_id"]
 
-
     connection = get_db()
 
-
-    # ======================================
-    # SAVE PROFILE
-    # ======================================
 
     if request.method == "POST":
 
@@ -535,48 +539,40 @@ def edit_profile():
             ""
         ).strip()
 
-
         skills = request.form.get(
             "skills",
             ""
         ).strip()
-
 
         looking_for = request.form.get(
             "looking_for",
             ""
         ).strip()
 
-
         location = request.form.get(
             "location",
             ""
         ).strip()
-
 
         availability = request.form.get(
             "availability",
             ""
         ).strip()
 
-
         github = request.form.get(
             "github",
             ""
         ).strip()
-
 
         linkedin = request.form.get(
             "linkedin",
             ""
         ).strip()
 
-
         youtube = request.form.get(
             "youtube",
             ""
         ).strip()
-
 
         portfolio = request.form.get(
             "portfolio",
@@ -639,7 +635,7 @@ def edit_profile():
 
 
         # ==================================
-        # UPDATE WITH IMAGE
+        # UPDATE PROFILE WITH IMAGE
         # ==================================
 
         if profile_picture:
@@ -677,7 +673,7 @@ def edit_profile():
 
 
         # ==================================
-        # UPDATE WITHOUT IMAGE
+        # UPDATE PROFILE WITHOUT IMAGE
         # ==================================
 
         else:
@@ -831,33 +827,25 @@ def discover():
         )
 
 
-    # ======================================
-    # GET FILTERS
-    # ======================================
-
     search = request.args.get(
         "search",
         ""
     ).strip()
-
 
     role = request.args.get(
         "role",
         ""
     ).strip()
 
-
     skills = request.args.get(
         "skills",
         ""
     ).strip()
 
-
     location = request.args.get(
         "location",
         ""
     ).strip()
-
 
     availability = request.args.get(
         "availability",
@@ -917,9 +905,7 @@ def discover():
         """
 
 
-        search_value = (
-            f"%{search}%"
-        )
+        search_value = f"%{search}%"
 
 
         parameters.extend([
@@ -997,10 +983,6 @@ def discover():
         )
 
 
-    # ======================================
-    # ORDER RESULTS
-    # ======================================
-
     query += """
         ORDER BY users.first_name ASC
     """
@@ -1055,10 +1037,6 @@ def invite(user_id):
     sender_id = session["user_id"]
 
 
-    # ======================================
-    # PREVENT SELF INVITE
-    # ======================================
-
     if sender_id == user_id:
 
         return redirect(
@@ -1070,7 +1048,7 @@ def invite(user_id):
 
 
     # ======================================
-    # CHECK RECEIVER
+    # CHECK USER
     # ======================================
 
     receiver = connection.execute("""
@@ -1092,12 +1070,11 @@ def invite(user_id):
 
 
     # ======================================
-    # CHECK EXISTING INVITATION
+    # CHECK PENDING INVITATION
     # ======================================
 
     existing = connection.execute("""
         SELECT id
-
         FROM invitations
 
         WHERE sender_id = ?
@@ -1117,14 +1094,12 @@ def invite(user_id):
         connection.close()
 
         return redirect(
-            url_for(
-                "discover"
-            )
+            url_for("discover")
         )
 
 
     # ======================================
-    # GET MESSAGE
+    # INVITATION MESSAGE
     # ======================================
 
     message = request.form.get(
@@ -1132,10 +1107,6 @@ def invite(user_id):
         ""
     ).strip()
 
-
-    # ======================================
-    # CREATE INVITATION
-    # ======================================
 
     connection.execute("""
         INSERT INTO invitations
@@ -1161,9 +1132,559 @@ def invite(user_id):
 
 
     return redirect(
-        url_for(
-            "discover"
+        url_for("discover")
+    )
+
+
+# ==========================================
+# INVITATIONS
+# ==========================================
+
+@app.route("/invitations")
+def invitations():
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
         )
+
+
+    user_id = session["user_id"]
+
+    connection = get_db()
+
+
+    # ======================================
+    # INCOMING
+    # ======================================
+
+    incoming = connection.execute("""
+        SELECT
+            invitations.id,
+            invitations.message,
+            invitations.status,
+            invitations.created_at,
+
+            users.id AS sender_id,
+            users.first_name AS sender_first_name,
+            users.last_name AS sender_last_name,
+            users.role AS sender_role,
+
+            profiles.profile_picture AS sender_picture,
+            profiles.bio AS sender_bio
+
+        FROM invitations
+
+        JOIN users
+        ON invitations.sender_id = users.id
+
+        LEFT JOIN profiles
+        ON users.id = profiles.user_id
+
+        WHERE invitations.receiver_id = ?
+
+        ORDER BY invitations.created_at DESC
+
+    """, (
+        user_id,
+    )).fetchall()
+
+
+    # ======================================
+    # OUTGOING
+    # ======================================
+
+    outgoing = connection.execute("""
+        SELECT
+            invitations.id,
+            invitations.message,
+            invitations.status,
+            invitations.created_at,
+
+            users.id AS receiver_id,
+            users.first_name AS receiver_first_name,
+            users.last_name AS receiver_last_name,
+            users.role AS receiver_role,
+
+            profiles.profile_picture AS receiver_picture
+
+        FROM invitations
+
+        JOIN users
+        ON invitations.receiver_id = users.id
+
+        LEFT JOIN profiles
+        ON users.id = profiles.user_id
+
+        WHERE invitations.sender_id = ?
+
+        ORDER BY invitations.created_at DESC
+
+    """, (
+        user_id,
+    )).fetchall()
+
+
+    connection.close()
+
+
+    return render_template(
+        "invitations.html",
+
+        incoming=incoming,
+
+        outgoing=outgoing
+    )
+
+
+# ==========================================
+# ACCEPT INVITATION
+# ==========================================
+
+@app.route(
+    "/invitation/<int:invitation_id>/accept",
+    methods=["POST"]
+)
+def accept_invitation(invitation_id):
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
+
+    user_id = session["user_id"]
+
+    connection = get_db()
+
+
+    invitation = connection.execute("""
+        SELECT *
+        FROM invitations
+
+        WHERE id = ?
+
+        AND receiver_id = ?
+
+        AND status = 'pending'
+
+    """, (
+        invitation_id,
+        user_id
+    )).fetchone()
+
+
+    if invitation is None:
+
+        connection.close()
+
+        return "Invitation not found", 404
+
+
+    connection.execute("""
+        UPDATE invitations
+
+        SET status = 'accepted'
+
+        WHERE id = ?
+
+    """, (
+        invitation_id,
+    ))
+
+
+    connection.commit()
+
+    connection.close()
+
+
+    return redirect(
+        url_for("invitations")
+    )
+
+
+# ==========================================
+# REJECT INVITATION
+# ==========================================
+
+@app.route(
+    "/invitation/<int:invitation_id>/reject",
+    methods=["POST"]
+)
+def reject_invitation(invitation_id):
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
+
+    user_id = session["user_id"]
+
+    connection = get_db()
+
+
+    invitation = connection.execute("""
+        SELECT *
+        FROM invitations
+
+        WHERE id = ?
+
+        AND receiver_id = ?
+
+        AND status = 'pending'
+
+    """, (
+        invitation_id,
+        user_id
+    )).fetchone()
+
+
+    if invitation is None:
+
+        connection.close()
+
+        return "Invitation not found", 404
+
+
+    connection.execute("""
+        UPDATE invitations
+
+        SET status = 'rejected'
+
+        WHERE id = ?
+
+    """, (
+        invitation_id,
+    ))
+
+
+    connection.commit()
+
+    connection.close()
+
+
+    return redirect(
+        url_for("invitations")
+    )
+
+
+# ==========================================
+# MY COLLABORATIONS
+# ==========================================
+
+@app.route("/collaborations")
+def collaborations():
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
+
+    user_id = session["user_id"]
+
+    connection = get_db()
+
+
+    collaborations = connection.execute("""
+        SELECT
+            invitations.id,
+            invitations.created_at,
+
+            CASE
+                WHEN invitations.sender_id = ?
+                THEN receiver.id
+                ELSE sender.id
+            END AS collaborator_id,
+
+            CASE
+                WHEN invitations.sender_id = ?
+                THEN receiver.first_name
+                ELSE sender.first_name
+            END AS collaborator_first_name,
+
+            CASE
+                WHEN invitations.sender_id = ?
+                THEN receiver.last_name
+                ELSE sender.last_name
+            END AS collaborator_last_name,
+
+            CASE
+                WHEN invitations.sender_id = ?
+                THEN receiver.role
+                ELSE sender.role
+            END AS collaborator_role,
+
+            CASE
+                WHEN invitations.sender_id = ?
+                THEN receiver.email
+                ELSE sender.email
+            END AS collaborator_email,
+
+            CASE
+                WHEN invitations.sender_id = ?
+                THEN receiver_profile.profile_picture
+                ELSE sender_profile.profile_picture
+            END AS collaborator_picture,
+
+            CASE
+                WHEN invitations.sender_id = ?
+                THEN receiver_profile.bio
+                ELSE sender_profile.bio
+            END AS collaborator_bio,
+
+            CASE
+                WHEN invitations.sender_id = ?
+                THEN receiver_profile.location
+                ELSE sender_profile.location
+            END AS collaborator_location
+
+        FROM invitations
+
+        JOIN users AS sender
+        ON invitations.sender_id = sender.id
+
+        JOIN users AS receiver
+        ON invitations.receiver_id = receiver.id
+
+        LEFT JOIN profiles AS sender_profile
+        ON sender.id = sender_profile.user_id
+
+        LEFT JOIN profiles AS receiver_profile
+        ON receiver.id = receiver_profile.user_id
+
+        WHERE
+            (
+                invitations.sender_id = ?
+                OR invitations.receiver_id = ?
+            )
+
+        AND invitations.status = 'accepted'
+
+        ORDER BY invitations.created_at DESC
+
+    """, (
+        user_id,
+        user_id,
+        user_id,
+        user_id,
+        user_id,
+        user_id,
+        user_id,
+        user_id,
+        user_id,
+        user_id
+    )).fetchall()
+
+
+    connection.close()
+
+
+    return render_template(
+        "collaborations.html",
+        collaborations=collaborations
+    )
+
+
+# ==========================================
+# CHAT
+# ==========================================
+
+@app.route(
+    "/chat/<int:user_id>",
+    methods=["GET", "POST"]
+)
+def chat(user_id):
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
+
+    current_user_id = session["user_id"]
+
+
+    # ======================================
+    # PREVENT SELF CHAT
+    # ======================================
+
+    if current_user_id == user_id:
+
+        return redirect(
+            url_for("collaborations")
+        )
+
+
+    connection = get_db()
+
+
+    # ======================================
+    # GET OTHER USER
+    # ======================================
+
+    other_user = connection.execute("""
+        SELECT
+            users.id,
+            users.first_name,
+            users.last_name,
+            users.role,
+            profiles.profile_picture
+
+        FROM users
+
+        LEFT JOIN profiles
+        ON users.id = profiles.user_id
+
+        WHERE users.id = ?
+
+    """, (
+        user_id,
+    )).fetchone()
+
+
+    if other_user is None:
+
+        connection.close()
+
+        return "User not found", 404
+
+
+    # ======================================
+    # CHECK ACCEPTED COLLABORATION
+    # ======================================
+
+    collaboration = connection.execute("""
+        SELECT id
+
+        FROM invitations
+
+        WHERE status = 'accepted'
+
+        AND (
+            (
+                sender_id = ?
+                AND receiver_id = ?
+            )
+
+            OR
+
+            (
+                sender_id = ?
+                AND receiver_id = ?
+            )
+        )
+
+    """, (
+        current_user_id,
+        user_id,
+        user_id,
+        current_user_id
+    )).fetchone()
+
+
+    if collaboration is None:
+
+        connection.close()
+
+        return (
+            "You can only message accepted collaborators.",
+            403
+        )
+
+
+    # ======================================
+    # SEND MESSAGE
+    # ======================================
+
+    if request.method == "POST":
+
+        message = request.form.get(
+            "message",
+            ""
+        ).strip()
+
+
+        if message:
+
+            connection.execute("""
+                INSERT INTO messages
+                (
+                    sender_id,
+                    receiver_id,
+                    message
+                )
+
+                VALUES (?, ?, ?)
+
+            """, (
+                current_user_id,
+                user_id,
+                message
+            ))
+
+
+            connection.commit()
+
+
+    # ======================================
+    # GET MESSAGES
+    # ======================================
+
+    messages = connection.execute("""
+        SELECT
+            messages.id,
+            messages.sender_id,
+            messages.receiver_id,
+            messages.message,
+            messages.created_at,
+
+            users.first_name,
+            users.last_name
+
+        FROM messages
+
+        JOIN users
+        ON messages.sender_id = users.id
+
+        WHERE
+            (
+                messages.sender_id = ?
+                AND messages.receiver_id = ?
+            )
+
+            OR
+
+            (
+                messages.sender_id = ?
+                AND messages.receiver_id = ?
+            )
+
+        ORDER BY messages.created_at ASC
+
+    """, (
+        current_user_id,
+        user_id,
+        user_id,
+        current_user_id
+    )).fetchall()
+
+
+    connection.close()
+
+
+    return render_template(
+        "chat.html",
+
+        other_user=other_user,
+
+        messages=messages
     )
 
 
@@ -1175,6 +1696,7 @@ def invite(user_id):
 def logout():
 
     session.clear()
+
 
     return redirect(
         url_for("login")

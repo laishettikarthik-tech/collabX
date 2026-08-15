@@ -10,9 +10,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>
-        CollabX Dashboard
-    </title>
+    <title>CollabX Dashboard</title>
 
     <link
         rel="stylesheet"
@@ -25,7 +23,11 @@
 <body>
 
 
-<nav class="navbar">
+<!-- ==========================================
+     NAVIGATION
+========================================== -->
+
+<nav class="dashboard-nav">
 
     <div class="nav-logo">
 
@@ -36,16 +38,28 @@
 
     <div class="nav-links">
 
+        <a href="/dashboard">
+            🏠 Dashboard
+        </a>
+
+        <a href="/discover">
+            🔎 Discover
+        </a>
+
+        <a href="/invitations">
+            📨 Invitations
+        </a>
+
         <a href="/profile">
-            My Profile
+            👤 My Profile
         </a>
 
         <a href="/edit-profile">
-            Edit Profile
+            ✏️ Edit Profile
         </a>
 
         <a href="/logout">
-            Logout
+            🚪 Logout
         </a>
 
     </div>
@@ -54,8 +68,16 @@
 
 
 
+<!-- ==========================================
+     MAIN DASHBOARD
+========================================== -->
+
 <main class="dashboard">
 
+
+    <!-- ======================================
+         WELCOME CARD
+    ======================================= -->
 
     <section class="welcome-card">
 
@@ -88,13 +110,14 @@
                 filename=user['profile_picture']
             ) }}"
             class="dashboard-picture"
+            alt="Profile picture"
         >
 
         {% else %}
 
         <div class="dashboard-placeholder">
 
-            {{ user["first_name"][0] }}
+            {{ user["first_name"][0]|upper }}
 
         </div>
 
@@ -105,7 +128,9 @@
 
 
 
-    <!-- PROFILE COMPLETION -->
+    <!-- ======================================
+         PROFILE COMPLETION
+    ======================================= -->
 
     <section class="completion-card">
 
@@ -127,27 +152,38 @@
             href="/edit-profile"
             class="primary-button"
         >
+
             Complete Profile →
+
         </a>
 
     </section>
 
 
 
-    <!-- FEATURES -->
+    <!-- ======================================
+         FEATURES
+    ======================================= -->
 
-    <section class="dashboard-grid">
+    <section class="dashboard-features">
 
 
-        <div class="dashboard-card">
+        <!-- DISCOVER -->
+
+        <a
+            href="/discover"
+            class="dashboard-card"
+        >
 
             <div class="card-icon">
                 🔎
             </div>
 
+
             <h2>
                 Discover
             </h2>
+
 
             <p>
 
@@ -157,40 +193,54 @@
 
             </p>
 
-        </div>
+        </a>
 
 
 
-        <div class="dashboard-card">
+        <!-- COLLABORATE -->
+
+        <a
+            href="/invitations"
+            class="dashboard-card"
+        >
 
             <div class="card-icon">
                 🤝
             </div>
 
+
             <h2>
                 Collaborate
             </h2>
 
+
             <p>
 
-                Create projects and invite
-                multiple people to your team.
+                View collaboration requests
+                and connect with people.
 
             </p>
 
-        </div>
+        </a>
 
 
 
-        <div class="dashboard-card">
+        <!-- PROJECTS -->
+
+        <a
+            href="/collaborations"
+            class="dashboard-card"
+        >
 
             <div class="card-icon">
                 🚀
             </div>
 
+
             <h2>
                 Projects
             </h2>
+
 
             <p>
 
@@ -199,7 +249,7 @@
 
             </p>
 
-        </div>
+        </a>
 
 
     </section>
