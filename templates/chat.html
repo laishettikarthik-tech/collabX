@@ -14,11 +14,6 @@
         Chat - CollabX
     </title>
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='style.css') }}"
-    >
-
     <style>
 
         * {
@@ -27,15 +22,15 @@
 
         body {
             margin: 0;
-            background: #f1f5f9;
             font-family: Arial, sans-serif;
+            background: #f1f5f9;
         }
 
-        /* ================================
+        /* =========================
            NAVBAR
-        ================================= */
+        ========================= */
 
-        .navbar {
+        nav {
             background: #111827;
             padding: 18px 5%;
             display: flex;
@@ -54,32 +49,32 @@
             color: #60a5fa;
         }
 
-        .nav-links a {
+        nav a {
             color: white;
             text-decoration: none;
             margin-left: 20px;
         }
 
-        /* ================================
-           CHAT PAGE
-        ================================= */
+        /* =========================
+           CHAT CONTAINER
+        ========================= */
 
-        .chat-page {
+        .chat-container {
             max-width: 900px;
             margin: 40px auto;
             padding: 0 20px;
         }
 
-        .chat-container {
+        .chat-box {
             background: white;
             border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             overflow: hidden;
-            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
         }
 
-        /* ================================
+        /* =========================
            CHAT HEADER
-        ================================= */
+        ========================= */
 
         .chat-header {
             background: #2563eb;
@@ -90,21 +85,15 @@
             gap: 15px;
         }
 
-        .back-button {
-            color: white;
-            text-decoration: none;
-            font-size: 22px;
-        }
-
-        .chat-profile {
+        .profile-picture {
             width: 50px;
             height: 50px;
             border-radius: 50%;
             object-fit: cover;
-            background: white;
+            background: #dbeafe;
         }
 
-        .chat-placeholder {
+        .profile-placeholder {
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -113,29 +102,29 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .chat-name {
             font-size: 20px;
             font-weight: bold;
         }
 
-        .chat-user-name {
-            font-size: 19px;
-            font-weight: bold;
-        }
-
-        .chat-user-role {
-            font-size: 13px;
+        .chat-role {
+            font-size: 14px;
             opacity: 0.9;
             margin-top: 4px;
         }
 
-        /* ================================
-           MESSAGE AREA
-        ================================= */
+        /* =========================
+           MESSAGES
+        ========================= */
 
         .messages {
             height: 500px;
-            padding: 25px;
             overflow-y: auto;
+            padding: 25px;
             background: #f8fafc;
         }
 
@@ -148,70 +137,69 @@
             justify-content: flex-end;
         }
 
-        .message-row.theirs {
-            justify-content: flex-start;
-        }
-
-        .message-bubble {
+        .message {
             max-width: 70%;
             padding: 12px 16px;
             border-radius: 15px;
             line-height: 1.5;
-            word-wrap: break-word;
         }
 
-        .mine .message-bubble {
+        .message.mine {
             background: #2563eb;
             color: white;
             border-bottom-right-radius: 4px;
         }
 
-        .theirs .message-bubble {
+        .message.theirs {
             background: white;
             color: #1e293b;
             border: 1px solid #e2e8f0;
             border-bottom-left-radius: 4px;
         }
 
-        .message-time {
-            font-size: 11px;
-            margin-top: 5px;
+        .message-name {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
             opacity: 0.7;
         }
 
-        .mine .message-time {
-            text-align: right;
+        .message-time {
+            font-size: 11px;
+            margin-top: 5px;
+            opacity: 0.6;
         }
 
+        /* =========================
+           EMPTY CHAT
+        ========================= */
+
         .empty-chat {
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             text-align: center;
+            padding: 100px 20px;
             color: #64748b;
         }
 
         .empty-chat-icon {
-            font-size: 45px;
-            margin-bottom: 10px;
+            font-size: 50px;
+            margin-bottom: 15px;
         }
 
-        /* ================================
+        /* =========================
            MESSAGE FORM
-        ================================= */
+        ========================= */
 
         .message-form {
-            padding: 18px;
-            background: white;
-            border-top: 1px solid #e2e8f0;
             display: flex;
             gap: 10px;
+            padding: 18px;
+            border-top: 1px solid #e2e8f0;
+            background: white;
         }
 
         .message-input {
             flex: 1;
-            padding: 13px 15px;
+            padding: 13px 16px;
             border: 1px solid #cbd5e1;
             border-radius: 10px;
             font-size: 15px;
@@ -223,11 +211,11 @@
         }
 
         .send-button {
+            padding: 13px 22px;
             border: none;
+            border-radius: 10px;
             background: #2563eb;
             color: white;
-            padding: 13px 22px;
-            border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
         }
@@ -236,37 +224,42 @@
             background: #1d4ed8;
         }
 
-        /* ================================
+        /* =========================
+           BACK BUTTON
+        ========================= */
+
+        .back {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* =========================
            MOBILE
-        ================================= */
+        ========================= */
 
         @media (max-width: 600px) {
 
-            .chat-page {
+            .chat-container {
                 margin: 20px auto;
-                padding: 0 10px;
             }
 
             .messages {
                 height: 450px;
-                padding: 15px;
             }
 
-            .message-bubble {
+            .message {
                 max-width: 85%;
             }
 
             .message-form {
-                padding: 12px;
+                flex-direction: column;
             }
 
             .send-button {
-                padding: 12px 15px;
-            }
-
-            .nav-links a {
-                margin-left: 8px;
-                font-size: 13px;
+                width: 100%;
             }
 
         }
@@ -279,11 +272,11 @@
 <body>
 
 
-<!-- ======================================
+<!-- =========================
      NAVBAR
-======================================= -->
+========================= -->
 
-<nav class="navbar">
+<nav>
 
     <a
         href="{{ url_for('dashboard') }}"
@@ -292,18 +285,18 @@
         Collab<span>X</span>
     </a>
 
-    <div class="nav-links">
+    <div>
 
         <a href="{{ url_for('collaborations') }}">
-            Collaborations
+            🤝 Collaborations
         </a>
 
-        <a href="{{ url_for('profile') }}">
-            My Profile
+        <a href="{{ url_for('invitations') }}">
+            📨 Invitations
         </a>
 
         <a href="{{ url_for('logout') }}">
-            Logout
+            🚪 Logout
         </a>
 
     </div>
@@ -311,28 +304,26 @@
 </nav>
 
 
-<!-- ======================================
+<!-- =========================
      CHAT
-======================================= -->
+========================= -->
 
-<div class="chat-page">
+<div class="chat-container">
 
-    <div class="chat-container">
+    <a
+        href="{{ url_for('collaborations') }}"
+        class="back"
+    >
+        ← Back to Collaborations
+    </a>
 
 
-        <!-- ================================
-             CHAT HEADER
-        ================================= -->
+    <div class="chat-box">
+
+
+        <!-- CHAT HEADER -->
 
         <div class="chat-header">
-
-
-            <a
-                href="{{ url_for('collaborations') }}"
-                class="back-button"
-            >
-                ←
-            </a>
 
 
             {% if other_user.profile_picture %}
@@ -342,13 +333,13 @@
                         'static',
                         filename=other_user.profile_picture
                     ) }}"
-                    class="chat-profile"
+                    class="profile-picture"
                     alt="Profile picture"
                 >
 
             {% else %}
 
-                <div class="chat-placeholder">
+                <div class="profile-placeholder">
 
                     {{ other_user.first_name[0]|upper }}
 
@@ -359,14 +350,14 @@
 
             <div>
 
-                <div class="chat-user-name">
+                <div class="chat-name">
 
                     {{ other_user.first_name }}
                     {{ other_user.last_name }}
 
                 </div>
 
-                <div class="chat-user-role">
+                <div class="chat-role">
 
                     {{ other_user.role }}
 
@@ -378,14 +369,11 @@
         </div>
 
 
-        <!-- ================================
+        <!-- =====================
              MESSAGES
-        ================================= -->
+        ====================== -->
 
-        <div
-            class="messages"
-            id="messages"
-        >
+        <div class="messages">
 
 
             {% if messages %}
@@ -396,9 +384,14 @@
 
                     {% if message.sender_id == session["user_id"] %}
 
+
                         <div class="message-row mine">
 
-                            <div class="message-bubble">
+                            <div class="message mine">
+
+                                <div class="message-name">
+                                    You
+                                </div>
 
                                 {{ message.message }}
 
@@ -415,16 +408,22 @@
 
                     {% else %}
 
-                        <div class="message-row theirs">
 
-                            <div class="message-bubble">
+                        <div class="message-row">
+
+                            <div class="message theirs">
+
+                                <div class="message-name">
+
+                                    {{ message.first_name }}
+                                    {{ message.last_name }}
+
+                                </div>
 
                                 {{ message.message }}
 
                                 <div class="message-time">
 
-                                    {{ message.first_name }}
-                                    ·
                                     {{ message.created_at }}
 
                                 </div>
@@ -432,6 +431,7 @@
                             </div>
 
                         </div>
+
 
                     {% endif %}
 
@@ -444,22 +444,19 @@
 
                 <div class="empty-chat">
 
-                    <div>
-
-                        <div class="empty-chat-icon">
-                            💬
-                        </div>
-
-                        <h3>
-                            Start the conversation
-                        </h3>
-
-                        <p>
-                            Send a message to
-                            {{ other_user.first_name }}.
-                        </p>
-
+                    <div class="empty-chat-icon">
+                        💬
                     </div>
+
+                    <h3>
+                        Start the conversation
+                    </h3>
+
+                    <p>
+                        Send a message to
+                        {{ other_user.first_name }}
+                        and start collaborating!
+                    </p>
 
                 </div>
 
@@ -470,11 +467,15 @@
         </div>
 
 
-        <!-- ================================
+        <!-- =====================
              MESSAGE INPUT
-        ================================= -->
+        ====================== -->
 
         <form
+            action="{{ url_for(
+                'chat',
+                user_id=other_user.id
+            ) }}"
             method="POST"
             class="message-form"
         >
@@ -488,12 +489,11 @@
                 required
             >
 
-
             <button
                 type="submit"
                 class="send-button"
             >
-                Send
+                Send 💬
             </button>
 
         </form>
@@ -504,19 +504,13 @@
 </div>
 
 
-<!-- ======================================
-     AUTO SCROLL
-======================================= -->
-
 <script>
 
-    const messages =
-        document.getElementById("messages");
+    const messages = document.querySelector(".messages");
 
     if (messages) {
 
-        messages.scrollTop =
-            messages.scrollHeight;
+        messages.scrollTop = messages.scrollHeight;
 
     }
 
