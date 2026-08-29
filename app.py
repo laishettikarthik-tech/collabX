@@ -1716,3 +1716,82 @@ if __name__ == "__main__":
         port=5000,
         debug=True
     )
+
+# ==========================================
+# CHAT
+# ==========================================
+
+@app.route("/chat/<int:user_id>", methods=["GET", "POST"])
+def chat(user_id):
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    current_user_id = session["user_id"]
+
+    connection = get_db()
+
+    # Get the person we are chatting with
+    user = connection.execute("""
+        SELECT
+            users.*,
+            profiles.*
+        FROM users
+        LEFT JOIN profiles
+        ON users.id = profiles.user_id
+        WHERE users.id = ?
+    """, (user_id,)).fetchone()
+
+    if user is None:
+        connection.close()
+        return "User not found", 404
+
+    # Send message
+    if request.method == "POST":
+
+        message = request.form.get(
+            "message",
+            ""
+        ).strip()
+
+        if message:
+
+            connection.execute("""
+                INSERT INTO messages
+                (
+                    sender_id,
+                    receiver_id,
+                    message
+                )
+                VALUES (?, ?, ?)
+            """, (
+                current_user_id,
+                user_id,
+                message
+            ))
+
+            connection.commit()
+
+    # Get conversation
+    messages = connection.execute("""
+        SELECT *
+        FROM messages
+        WHERE
+            (sender_id = ? AND receiver_id = ?)
+            OR
+            (sender_id = ? AND receiver_id = ?)
+        ORDER BY created_at ASC
+    """, (
+        current_user_id,
+        user_id,
+        user_id,
+        current_user_id
+    )).fetchall()
+
+    connection.close()
+
+    return render_template(
+        "chat.html",
+        user=user,
+        messages=messages
+    )
