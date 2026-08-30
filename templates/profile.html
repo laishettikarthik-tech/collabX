@@ -293,14 +293,12 @@
 
         {% if session["user_id"] != user["id"] %}
 
-        <button
-            class="primary-button"
-            onclick="alert('Collaboration invitations will be added in Phase 3!')"
-        >
-
-            🤝 Invite to Collaborate
-
-        </button>
+        <a
+               href="{{ url_for('chat', user_id=user['id']) }}"
+               class="primary-button"
+     >
+    💬 Chat
+        </a>
 
         {% endif %}
 
