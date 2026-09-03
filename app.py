@@ -1689,6 +1689,170 @@ def chat(user_id):
 
 
 # ==========================================
+# MESSAGES INBOX
+# ==========================================
+
+@app.context_processor
+def inject_unread_messages():
+
+    if "user_id" not in session:
+        return {
+            "unread_messages": 0,
+            "unread_invitations": 0
+        }
+
+    connection = get_db()
+
+    unread_messages = connection.execute("""
+        SELECT COUNT(*) AS count
+        FROM messages
+        WHERE receiver_id = ?
+        AND is_read = 0
+    """, (session["user_id"],)).fetchone()["count"]
+
+    unread_invitations = connection.execute("""
+        SELECT COUNT(*) AS count
+        FROM invitations
+        WHERE receiver_id = ?
+        AND status = 'pending'
+    """, (session["user_id"],)).fetchone()["count"]
+
+    connection.close()
+
+    return {
+        "unread_messages": unread_messages,
+        "unread_invitations": unread_invitations
+    }
+
+@app.route("/messages")
+def messages_inbox():
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
+
+    current_user_id = session["user_id"]
+
+    connection = get_db()
+
+
+    conversations = connection.execute("""
+        SELECT DISTINCT
+
+            CASE
+                WHEN sender_id = ?
+                THEN receiver_id
+                ELSE sender_id
+            END AS other_user_id
+
+        FROM messages
+
+        WHERE sender_id = ?
+        OR receiver_id = ?
+
+    """, (
+        current_user_id,
+        current_user_id,
+        current_user_id
+    )).fetchall()
+
+
+    users = []
+
+
+    for conversation in conversations:
+
+        other_user_id = conversation["other_user_id"]
+
+
+        user = connection.execute("""
+            SELECT
+                users.id,
+                users.first_name,
+                users.last_name,
+                users.role,
+                profiles.profile_picture
+
+            FROM users
+
+            LEFT JOIN profiles
+            ON users.id = profiles.user_id
+
+            WHERE users.id = ?
+
+        """, (
+            other_user_id,
+        )).fetchone()
+
+
+        last_message = connection.execute("""
+            SELECT
+                message,
+                created_at,
+                sender_id
+
+            FROM messages
+
+            WHERE
+                (
+                    sender_id = ?
+                    AND receiver_id = ?
+                )
+
+                OR
+
+                (
+                    sender_id = ?
+                    AND receiver_id = ?
+                )
+
+            ORDER BY created_at DESC
+
+            LIMIT 1
+
+        """, (
+            current_user_id,
+            other_user_id,
+            other_user_id,
+            current_user_id
+        )).fetchone()
+
+
+        unread = connection.execute("""
+            SELECT COUNT(*) AS count
+
+            FROM messages
+
+            WHERE sender_id = ?
+            AND receiver_id = ?
+            AND is_read = 0
+
+        """, (
+            other_user_id,
+            current_user_id
+        )).fetchone()["count"]
+
+
+        users.append({
+            "user": user,
+            "last_message": last_message,
+            "unread": unread
+        })
+
+
+    connection.close()
+
+
+    return render_template(
+        "messages.html",
+        conversations=users
+    )
+
+
+# ==========================================
 # LOGOUT
 # ==========================================
 
@@ -1746,8 +1910,22 @@ def chat(user_id):
         connection.close()
         return "User not found", 404
 
+        # Mark messages from this user as read
+    connection.execute("""
+        UPDATE messages
+        SET is_read = 1
+        WHERE sender_id = ?
+          AND receiver_id = ?
+          AND is_read = 0
+    """, (
+        user_id,
+        current_user_id
+    ))
+
+    connection.commit()
+
     # Send message
-    if request.method == "POST":
+    if request.method == "POST": 
 
         message = request.form.get(
             "message",

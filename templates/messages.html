@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Messages - CollabX</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+    <style>
+
+        body {
+            background: #f8fafc;
+        }
+
+        .page {
+            max-width: 900px;
+            margin: auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 38px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #64748b;
+        }
+
+        .messages-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .conversation {
+            background: white;
+            padding: 18px;
+            border-radius: 15px;
+
+            display: flex;
+            align-items: center;
+            gap: 15px;
+
+            text-decoration: none;
+            color: inherit;
+
+            box-shadow: 0 5px 18px rgba(0,0,0,0.06);
+
+            transition: 0.2s;
+        }
+
+        .conversation:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.10);
+        }
+
+        .profile-picture {
+            width: 60px;
+            height: 60px;
+
+            border-radius: 50%;
+            object-fit: cover;
+
+            background: #e2e8f0;
+        }
+
+        .placeholder {
+            width: 60px;
+            height: 60px;
+
+            border-radius: 50%;
+
+            background: #2563eb;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .conversation-info {
+            flex: 1;
+        }
+
+        .name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .role {
+            color: #2563eb;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .last-message {
+            color: #64748b;
+            font-size: 14px;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            max-width: 600px;
+        }
+
+        .unread {
+            background: #2563eb;
+            color: white;
+
+            min-width: 25px;
+            height: 25px;
+
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .empty {
+            background: white;
+            padding: 60px 25px;
+
+            border-radius: 18px;
+
+            text-align: center;
+            color: #64748b;
+        }
+
+        .empty-icon {
+            font-size: 55px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 600px) {
+
+            .header h1 {
+                font-size: 30px;
+            }
+
+            .last-message {
+                max-width: 200px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ======================================
+     NAVIGATION
+======================================= -->
+
+<nav class="dashboard-nav">
+
+    <div class="nav-logo">
+
+        Collab<span>X</span>
+
+    </div>
+
+
+    <div class="nav-links">
+
+        <a href="/dashboard">
+            🏠 Dashboard
+        </a>
+
+        <a href="/discover">
+            🔎 Discover
+        </a>
+
+        <a href="/invitations">
+            📨 Invitations
+        </a>
+
+        <a href="/collaborations">
+            🤝 Collaborations
+        </a>
+
+        <a href="/messages">
+            💬 Messages
+        </a>
+
+        <a href="/profile">
+            👤 My Profile
+        </a>
+
+        <a href="/logout">
+            🚪 Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- ======================================
+     MAIN
+======================================= -->
+
+<div class="page">
+
+
+    <div class="header">
+
+        <h1>
+            💬 Messages
+        </h1>
+
+        <p>
+            Your conversations with collaborators.
+        </p>
+
+    </div>
+
+
+    {% if conversations %}
+
+    <div class="messages-list">
+
+
+        {% for conversation in conversations %}
+
+        <a
+            href="{{ url_for(
+                'chat',
+                user_id=conversation.user.id
+            ) }}"
+            class="conversation"
+        >
+
+
+            <!-- PROFILE -->
+
+            {% if conversation.user.profile_picture %}
+
+            <img
+                src="{{ url_for(
+                    'static',
+                    filename=conversation.user.profile_picture
+                ) }}"
+                class="profile-picture"
+                alt="Profile picture"
+            >
+
+            {% else %}
+
+            <div class="placeholder">
+
+                {{ conversation.user.first_name[0]|upper }}
+
+            </div>
+
+            {% endif %}
+
+
+            <!-- INFORMATION -->
+
+            <div class="conversation-info">
+
+                <div class="name">
+
+                    {{ conversation.user.first_name }}
+                    {{ conversation.user.last_name }}
+
+                </div>
+
+
+                <div class="role">
+
+                    {{ conversation.user.role }}
+
+                </div>
+
+
+                {% if conversation.last_message %}
+
+                <div class="last-message">
+
+                    {{ conversation.last_message.message }}
+
+                </div>
+
+                {% else %}
+
+                <div class="last-message">
+
+                    No messages yet.
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- UNREAD -->
+
+            {% if conversation.unread > 0 %}
+
+            <div class="unread">
+
+                {{ conversation.unread }}
+
+            </div>
+
+            {% endif %}
+
+
+        </a>
+
+        {% endfor %}
+
+
+    </div>
+
+
+    {% else %}
+
+
+    <div class="empty">
+
+        <div class="empty-icon">
+            💬
+        </div>
+
+        <h2>
+            No conversations yet
+        </h2>
+
+        <p>
+            Start collaborating with someone
+            to begin a conversation.
+        </p>
+
+        <br>
+
+        <a
+            href="/discover"
+            class="view-button"
+            style="
+                display:inline-block;
+                padding:12px 25px;
+                background:#2563eb;
+                color:white;
+                text-decoration:none;
+                border-radius:9px;
+            "
+        >
+            🔎 Discover People
+        </a>
+
+    </div>
+
+
+    {% endif %}
+
+
+</div>
+
+</body>
+
+</html>

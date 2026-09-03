@@ -46,9 +46,25 @@
             🔎 Discover
         </a>
 
-        <a href="/invitations">
-            📨 Invitations
-        </a>
+        <a href="{{ url_for('invitations') }}">
+    📨 Invitations
+
+    {% if unread_invitations > 0 %}
+        <span class="notification-badge">
+            {{ unread_invitations }}
+        </span>
+    {% endif %}
+</a>
+        
+        <a href="{{ url_for('messages_inbox') }}">
+    💬 Messages
+
+    {% if unread_messages > 0 %}
+        <span class="notification-badge">
+            {{ unread_messages }}
+        </span>
+    {% endif %}
+</a>
 
         <a href="/profile">
             👤 My Profile
