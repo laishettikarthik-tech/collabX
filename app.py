@@ -475,38 +475,107 @@ def login():
 def dashboard():
 
     if "user_id" not in session:
-
         return redirect(
             url_for("login")
         )
 
+    current_user_id = session["user_id"]
 
     connection = get_db()
 
+    # ==========================================
+    # GET CURRENT USER
+    # ==========================================
 
     user = connection.execute("""
         SELECT
             users.*,
             profiles.*
-
         FROM users
-
         LEFT JOIN profiles
         ON users.id = profiles.user_id
-
         WHERE users.id = ?
-
     """, (
-        session["user_id"],
+        current_user_id,
     )).fetchone()
 
+    # ==========================================
+    # PROFILE COMPLETION
+    # ==========================================
+
+    profile_fields = [
+        user["profile_picture"],
+        user["bio"],
+        user["skills"],
+        user["looking_for"],
+        user["location"],
+        user["availability"],
+        user["github"],
+        user["linkedin"],
+        user["youtube"],
+        user["portfolio"]
+    ]
+
+    completed_fields = sum(
+        1
+        for field in profile_fields
+        if field and str(field).strip()
+    )
+
+    profile_completion = int(
+        (completed_fields / len(profile_fields)) * 100
+    )
+
+    # ==========================================
+    # ACCEPTED COLLABORATIONS
+    # ==========================================
+
+    collaborations_count = connection.execute("""
+        SELECT COUNT(*) AS count
+        FROM invitations
+        WHERE
+            (sender_id = ? OR receiver_id = ?)
+            AND status = 'accepted'
+    """, (
+        current_user_id,
+        current_user_id
+    )).fetchone()["count"]
+
+    # ==========================================
+    # PENDING INVITATIONS
+    # ==========================================
+
+    pending_invitations = connection.execute("""
+        SELECT COUNT(*) AS count
+        FROM invitations
+        WHERE receiver_id = ?
+        AND status = 'pending'
+    """, (
+        current_user_id,
+    )).fetchone()["count"]
+
+    # ==========================================
+    # UNREAD MESSAGES
+    # ==========================================
+
+    unread_messages_count = connection.execute("""
+        SELECT COUNT(*) AS count
+        FROM messages
+        WHERE receiver_id = ?
+        AND is_read = 0
+    """, (
+        current_user_id,
+    )).fetchone()["count"]
 
     connection.close()
 
-
     return render_template(
         "dashboard.html",
-        user=user
+        user=user,
+        collaborations_count=collaborations_count,
+        pending_invitations=pending_invitations,
+        unread_messages_count=unread_messages_count,
+        profile_completion=profile_completion
     )
 
 
@@ -521,16 +590,17 @@ def dashboard():
 def edit_profile():
 
     if "user_id" not in session:
-
         return redirect(
             url_for("login")
         )
-
 
     user_id = session["user_id"]
 
     connection = get_db()
 
+    # ==========================================
+    # SAVE PROFILE
+    # ==========================================
 
     if request.method == "POST":
 
@@ -579,20 +649,17 @@ def edit_profile():
             ""
         ).strip()
 
-
-        # ==================================
+        # ==========================================
         # PROFILE IMAGE
-        # ==================================
+        # ==========================================
 
         profile_picture = None
-
 
         if "profile_picture" in request.files:
 
             file = request.files[
                 "profile_picture"
             ]
-
 
             if (
                 file
@@ -610,13 +677,11 @@ def edit_profile():
                         )
                     )
 
-
                     filename = (
                         str(user_id)
                         + "_"
                         + original_filename
                     )
-
 
                     file.save(
                         os.path.join(
@@ -627,22 +692,19 @@ def edit_profile():
                         )
                     )
 
-
                     profile_picture = (
                         "uploads/"
                         + filename
                     )
 
-
-        # ==================================
+        # ==========================================
         # UPDATE PROFILE WITH IMAGE
-        # ==================================
+        # ==========================================
 
         if profile_picture:
 
             connection.execute("""
                 UPDATE profiles
-
                 SET
                     bio = ?,
                     skills = ?,
@@ -654,9 +716,7 @@ def edit_profile():
                     youtube = ?,
                     portfolio = ?,
                     profile_picture = ?
-
                 WHERE user_id = ?
-
             """, (
                 bio,
                 skills,
@@ -671,16 +731,14 @@ def edit_profile():
                 user_id
             ))
 
-
-        # ==================================
+        # ==========================================
         # UPDATE PROFILE WITHOUT IMAGE
-        # ==================================
+        # ==========================================
 
         else:
 
             connection.execute("""
                 UPDATE profiles
-
                 SET
                     bio = ?,
                     skills = ?,
@@ -691,9 +749,7 @@ def edit_profile():
                     linkedin = ?,
                     youtube = ?,
                     portfolio = ?
-
                 WHERE user_id = ?
-
             """, (
                 bio,
                 skills,
@@ -707,46 +763,35 @@ def edit_profile():
                 user_id
             ))
 
-
         connection.commit()
-
         connection.close()
-
 
         return redirect(
             url_for("profile")
         )
 
-
-    # ======================================
+    # ==========================================
     # LOAD PROFILE
-    # ======================================
+    # ==========================================
 
     user = connection.execute("""
         SELECT
             users.*,
             profiles.*
-
         FROM users
-
         LEFT JOIN profiles
         ON users.id = profiles.user_id
-
         WHERE users.id = ?
-
     """, (
         user_id,
     )).fetchone()
 
-
     connection.close()
-
 
     return render_template(
         "edit_profile.html",
         user=user
     )
-
 
 # ==========================================
 # PUBLIC PROFILE
@@ -1144,19 +1189,16 @@ def invite(user_id):
 def invitations():
 
     if "user_id" not in session:
-
         return redirect(
             url_for("login")
         )
-
 
     user_id = session["user_id"]
 
     connection = get_db()
 
-
     # ======================================
-    # INCOMING
+    # INCOMING INVITATIONS
     # ======================================
 
     incoming = connection.execute("""
@@ -1192,7 +1234,7 @@ def invitations():
 
 
     # ======================================
-    # OUTGOING
+    # OUTGOING INVITATIONS
     # ======================================
 
     outgoing = connection.execute("""
@@ -1231,12 +1273,9 @@ def invitations():
 
     return render_template(
         "invitations.html",
-
         incoming=incoming,
-
         outgoing=outgoing
     )
-
 
 # ==========================================
 # ACCEPT INVITATION
@@ -1910,7 +1949,10 @@ def chat(user_id):
         connection.close()
         return "User not found", 404
 
-        # Mark messages from this user as read
+    # ==========================================
+    # MARK INCOMING MESSAGES AS READ
+    # ==========================================
+
     connection.execute("""
         UPDATE messages
         SET is_read = 1
@@ -1924,8 +1966,11 @@ def chat(user_id):
 
     connection.commit()
 
-    # Send message
-    if request.method == "POST": 
+    # ==========================================
+    # SEND MESSAGE
+    # ==========================================
+
+    if request.method == "POST":
 
         message = request.form.get(
             "message",
@@ -1950,7 +1995,10 @@ def chat(user_id):
 
             connection.commit()
 
-    # Get conversation
+    # ==========================================
+    # GET CONVERSATION
+    # ==========================================
+
     messages = connection.execute("""
         SELECT *
         FROM messages

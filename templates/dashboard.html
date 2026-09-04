@@ -150,32 +150,100 @@
 
     <section class="completion-card">
 
-        <h2>
-            Complete your profile
-        </h2>
+    <h2>
+        Complete your profile
+    </h2>
+
+    <p>
+        A complete profile helps
+        companies and creators
+        find you.
+    </p>
+
+    <a
+        href="/edit-profile"
+        class="primary-button"
+    >
+        Complete Profile →
+    </a>
+
+</section>
+
+<!-- ======================================
+     DASHBOARD STATISTICS
+====================================== -->
+
+<section class="dashboard-stats">
+
+    <!-- COLLABORATIONS -->
+
+    <a href="/collaborations" class="stat-card">
+
+        <div class="stat-icon">
+            🤝
+        </div>
+
+        <div class="stat-info">
+
+            <h3>
+                {{ collaborations_count }}
+            </h3>
+
+            <p>
+                Collaborations
+            </p>
+
+        </div>
+
+    </a>
 
 
-        <p>
+    <!-- PENDING INVITATIONS -->
 
-            A complete profile helps
-            companies and creators
-            find you.
+    <a href="/invitations" class="stat-card">
 
-        </p>
+        <div class="stat-icon">
+            📨
+        </div>
+
+        <div class="stat-info">
+
+            <h3>
+                {{ pending_invitations }}
+            </h3>
+
+            <p>
+                Pending Invitations
+            </p>
+
+        </div>
+
+    </a>
 
 
-        <a
-            href="/edit-profile"
-            class="primary-button"
-        >
+    <!-- UNREAD MESSAGES -->
 
-            Complete Profile →
+    <a href="{{ url_for('messages_inbox') }}" class="stat-card">
 
-        </a>
+        <div class="stat-icon">
+            💬
+        </div>
 
-    </section>
+        <div class="stat-info">
 
+            <h3>
+                {{ unread_messages_count }}
+            </h3>
 
+            <p>
+                Unread Messages
+            </p>
+
+        </div>
+
+    </a>
+
+</section>
 
     <!-- ======================================
          FEATURES
