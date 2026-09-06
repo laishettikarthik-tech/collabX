@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Notifications - CollabX</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="nav-logo">
+        Collab<span>X</span>
+    </div>
+
+    <div class="nav-links">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('discover') }}">Discover</a>
+        <a href="{{ url_for('invitations') }}">📨 Invitations</a>
+        <a href="{{ url_for('messages_inbox') }}">💬 Messages</a>
+        <a href="{{ url_for('profile') }}">My Profile</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+
+</nav>
+
+<main class="notifications-page">
+
+    <h1>🔔 Notifications</h1>
+
+    {% if notifications %}
+
+        {% for notification in notifications %}
+
+            <div class="notification-card">
+
+                <div class="notification-icon">
+                    {{ notification.icon }}
+                </div>
+
+                <div class="notification-content">
+
+                    <h3>
+                        {{ notification.title }}
+                    </h3>
+
+                    <p>
+                        {{ notification.message }}
+                    </p>
+
+                    <small>
+                        {{ notification.created_at }}
+                    </small>
+
+                </div>
+
+                {% if notification.link %}
+                    <a
+                        href="{{ notification.link }}"
+                        class="primary-button"
+                    >
+                        View
+                    </a>
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="empty-notifications">
+
+            <h2>You're all caught up! 🎉</h2>
+
+            <p>No new notifications.</p>
+
+        </div>
+
+    {% endif %}
+
+</main>
+
+</body>
+</html>

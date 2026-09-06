@@ -1255,6 +1255,87 @@ def invitations():
     )
 
 # ==========================================
+# NOTIFICATIONS
+# ==========================================
+
+@app.route("/notifications")
+def notifications():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    user_id = session["user_id"]
+
+    connection = get_db()
+
+    notifications = []
+
+    # Pending collaboration invitations
+    invitations_list = connection.execute("""
+        SELECT
+            invitations.id,
+            invitations.created_at,
+            users.first_name,
+            users.last_name
+        FROM invitations
+        JOIN users
+        ON invitations.sender_id = users.id
+        WHERE invitations.receiver_id = ?
+        AND invitations.status = 'pending'
+        ORDER BY invitations.created_at DESC
+    """, (user_id,)).fetchall()
+
+    for invitation in invitations_list:
+        notifications.append({
+            "icon": "📨",
+            "title": "New Collaboration Invitation",
+            "message": f"{invitation['first_name']} {invitation['last_name']} sent you a collaboration invitation.",
+            "created_at": invitation["created_at"],
+            "link": url_for("invitations")
+        })
+
+    # Unread messages
+    messages_list = connection.execute("""
+        SELECT
+            messages.created_at,
+            users.first_name,
+            users.last_name
+        FROM messages
+        JOIN users
+        ON messages.sender_id = users.id
+        WHERE messages.receiver_id = ?
+        AND messages.is_read = 0
+        ORDER BY messages.created_at DESC
+    """, (user_id,)).fetchall()
+
+    for message in messages_list:
+        notifications.append({
+            "icon": "💬",
+            "title": "New Message",
+            "message": f"You have a new message from {message['first_name']} {message['last_name']}.",
+            "created_at": message["created_at"],
+            "link": url_for(
+                "chat",
+                user_id=connection.execute(
+                    "SELECT id FROM users WHERE first_name = ? AND last_name = ? LIMIT 1",
+                    (message["first_name"], message["last_name"])
+                ).fetchone()["id"]
+            )
+        })
+
+    connection.close()
+
+    notifications.sort(
+        key=lambda x: x["created_at"],
+        reverse=True
+    )
+
+    return render_template(
+        "notifications.html",
+        notifications=notifications
+    )
+
+# ==========================================
 # ACCEPT INVITATION
 # ==========================================
 
