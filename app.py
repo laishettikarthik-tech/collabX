@@ -583,98 +583,51 @@ def dashboard():
 # EDIT PROFILE
 # ==========================================
 
-@app.route(
-    "/edit-profile",
-    methods=["GET", "POST"]
-)
+@app.route("/edit-profile", methods=["GET", "POST"])
 def edit_profile():
 
     if "user_id" not in session:
-        return redirect(
-            url_for("login")
-        )
+        return redirect(url_for("login"))
 
     user_id = session["user_id"]
 
     connection = get_db()
 
-    # ==========================================
-    # SAVE PROFILE
-    # ==========================================
-
     if request.method == "POST":
 
-        bio = request.form.get(
-            "bio",
-            ""
-        ).strip()
+        bio = request.form.get("bio", "").strip()
+        skills = request.form.get("skills", "").strip()
+        looking_for = request.form.get("looking_for", "").strip()
+        location = request.form.get("location", "").strip()
+        availability = request.form.get("availability", "").strip()
+        github = request.form.get("github", "").strip()
+        linkedin = request.form.get("linkedin", "").strip()
+        youtube = request.form.get("youtube", "").strip()
+        portfolio = request.form.get("portfolio", "").strip()
 
-        skills = request.form.get(
-            "skills",
-            ""
-        ).strip()
+        # Check if profile already exists
+        existing_profile = connection.execute("""
+            SELECT id
+            FROM profiles
+            WHERE user_id = ?
+        """, (user_id,)).fetchone()
 
-        looking_for = request.form.get(
-            "looking_for",
-            ""
-        ).strip()
-
-        location = request.form.get(
-            "location",
-            ""
-        ).strip()
-
-        availability = request.form.get(
-            "availability",
-            ""
-        ).strip()
-
-        github = request.form.get(
-            "github",
-            ""
-        ).strip()
-
-        linkedin = request.form.get(
-            "linkedin",
-            ""
-        ).strip()
-
-        youtube = request.form.get(
-            "youtube",
-            ""
-        ).strip()
-
-        portfolio = request.form.get(
-            "portfolio",
-            ""
-        ).strip()
-
-        # ==========================================
+        # ------------------------------------------
         # PROFILE IMAGE
-        # ==========================================
+        # ------------------------------------------
 
         profile_picture = None
 
         if "profile_picture" in request.files:
 
-            file = request.files[
-                "profile_picture"
-            ]
+            file = request.files["profile_picture"]
 
-            if (
-                file
-                and
-                file.filename != ""
-            ):
+            if file and file.filename != "":
 
-                if allowed_file(
-                    file.filename
-                ):
+                if allowed_file(file.filename):
 
-                    original_filename = (
-                        secure_filename(
-                            file.filename
-                        )
+                    original_filename = secure_filename(
+                        file.filename
                     )
 
                     filename = (
@@ -685,72 +638,100 @@ def edit_profile():
 
                     file.save(
                         os.path.join(
-                            app.config[
-                                "UPLOAD_FOLDER"
-                            ],
+                            app.config["UPLOAD_FOLDER"],
                             filename
                         )
                     )
 
-                    profile_picture = (
-                        "uploads/"
-                        + filename
-                    )
+                    profile_picture = "uploads/" + filename
 
-        # ==========================================
-        # UPDATE PROFILE WITH IMAGE
-        # ==========================================
+        # ------------------------------------------
+        # UPDATE EXISTING PROFILE
+        # ------------------------------------------
 
-        if profile_picture:
+        if existing_profile:
 
-            connection.execute("""
-                UPDATE profiles
-                SET
-                    bio = ?,
-                    skills = ?,
-                    looking_for = ?,
-                    location = ?,
-                    availability = ?,
-                    github = ?,
-                    linkedin = ?,
-                    youtube = ?,
-                    portfolio = ?,
-                    profile_picture = ?
-                WHERE user_id = ?
-            """, (
-                bio,
-                skills,
-                looking_for,
-                location,
-                availability,
-                github,
-                linkedin,
-                youtube,
-                portfolio,
-                profile_picture,
-                user_id
-            ))
+            if profile_picture:
 
-        # ==========================================
-        # UPDATE PROFILE WITHOUT IMAGE
-        # ==========================================
+                connection.execute("""
+                    UPDATE profiles
+                    SET
+                        bio = ?,
+                        skills = ?,
+                        looking_for = ?,
+                        location = ?,
+                        availability = ?,
+                        github = ?,
+                        linkedin = ?,
+                        youtube = ?,
+                        portfolio = ?,
+                        profile_picture = ?
+                    WHERE user_id = ?
+                """, (
+                    bio,
+                    skills,
+                    looking_for,
+                    location,
+                    availability,
+                    github,
+                    linkedin,
+                    youtube,
+                    portfolio,
+                    profile_picture,
+                    user_id
+                ))
+
+            else:
+
+                connection.execute("""
+                    UPDATE profiles
+                    SET
+                        bio = ?,
+                        skills = ?,
+                        looking_for = ?,
+                        location = ?,
+                        availability = ?,
+                        github = ?,
+                        linkedin = ?,
+                        youtube = ?,
+                        portfolio = ?
+                    WHERE user_id = ?
+                """, (
+                    bio,
+                    skills,
+                    looking_for,
+                    location,
+                    availability,
+                    github,
+                    linkedin,
+                    youtube,
+                    portfolio,
+                    user_id
+                ))
+
+        # ------------------------------------------
+        # CREATE PROFILE IF IT DOES NOT EXIST
+        # ------------------------------------------
 
         else:
 
             connection.execute("""
-                UPDATE profiles
-                SET
-                    bio = ?,
-                    skills = ?,
-                    looking_for = ?,
-                    location = ?,
-                    availability = ?,
-                    github = ?,
-                    linkedin = ?,
-                    youtube = ?,
-                    portfolio = ?
-                WHERE user_id = ?
+                INSERT INTO profiles (
+                    user_id,
+                    bio,
+                    skills,
+                    looking_for,
+                    location,
+                    availability,
+                    github,
+                    linkedin,
+                    youtube,
+                    portfolio,
+                    profile_picture
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
+                user_id,
                 bio,
                 skills,
                 looking_for,
@@ -760,19 +741,17 @@ def edit_profile():
                 linkedin,
                 youtube,
                 portfolio,
-                user_id
+                profile_picture
             ))
 
         connection.commit()
         connection.close()
 
-        return redirect(
-            url_for("profile")
-        )
+        return redirect(url_for("profile"))
 
-    # ==========================================
+    # ------------------------------------------
     # LOAD PROFILE
-    # ==========================================
+    # ------------------------------------------
 
     user = connection.execute("""
         SELECT
@@ -782,9 +761,7 @@ def edit_profile():
         LEFT JOIN profiles
         ON users.id = profiles.user_id
         WHERE users.id = ?
-    """, (
-        user_id,
-    )).fetchone()
+    """, (user_id,)).fetchone()
 
     connection.close()
 

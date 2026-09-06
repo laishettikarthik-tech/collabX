@@ -1,18 +1,14 @@
-`<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>
-        {{ user["first_name"] }} {{ user["last_name"] }}
-        - CollabX
+        {{ user["first_name"] }} {{ user["last_name"] }} - CollabX
     </title>
 
     <link
@@ -22,31 +18,46 @@
 
 </head>
 
-
 <body>
 
+<!-- ==========================================
+     NAVBAR
+========================================== -->
 
 <nav class="navbar">
 
     <div class="nav-logo">
-
         Collab<span>X</span>
-
     </div>
-
 
     <div class="nav-links">
 
-        <a href="/dashboard">
-            Dashboard
+        <a href="{{ url_for('dashboard') }}">
+            🏠 Dashboard
         </a>
 
-        <a href="/profile">
-            My Profile
+        <a href="{{ url_for('discover') }}">
+            🔎 Discover
         </a>
 
-        <a href="/logout">
-            Logout
+        <a href="{{ url_for('invitations') }}">
+            📨 Invitations
+        </a>
+
+        <a href="{{ url_for('messages_inbox') }}">
+            💬 Messages
+        </a>
+
+        <a href="{{ url_for('profile') }}">
+            👤 My Profile
+        </a>
+
+        <a href="{{ url_for('edit_profile') }}">
+            ✏️ Edit Profile
+        </a>
+
+        <a href="{{ url_for('logout') }}">
+            🚪 Logout
         </a>
 
     </div>
@@ -54,17 +65,20 @@
 </nav>
 
 
+<!-- ==========================================
+     PROFILE PAGE
+========================================== -->
 
 <main class="profile-page">
-
 
     <div class="public-profile">
 
 
-        <!-- PROFILE HEADER -->
+        <!-- ======================================
+             PROFILE HEADER
+        ======================================= -->
 
         <div class="profile-header">
-
 
             {% if user["profile_picture"] %}
 
@@ -74,90 +88,75 @@
                         filename=user['profile_picture']
                     ) }}"
                     class="large-profile-picture"
+                    alt="Profile Picture"
                 >
 
             {% else %}
 
                 <div class="large-profile-placeholder">
 
-                    {{ user["first_name"][0] }}
+                    {{ user["first_name"][0] | upper }}
 
                 </div>
 
             {% endif %}
 
 
-
-            <div>
+            <div class="profile-header-info">
 
                 <h1>
-
                     {{ user["first_name"] }}
                     {{ user["last_name"] }}
-
                 </h1>
 
-
                 <p class="role">
-
                     {{ user["role"] }}
-
                 </p>
 
 
                 {% if user["location"] %}
 
-                <p class="location">
-
-                    📍 {{ user["location"] }}
-
-                </p>
+                    <p class="location">
+                        📍 {{ user["location"] }}
+                    </p>
 
                 {% endif %}
 
 
                 {% if user["availability"] == "Available" %}
 
-                <span class="available">
-
-                    🟢 Available for collaboration
-
-                </span>
+                    <span class="available">
+                        🟢 Available for collaboration
+                    </span>
 
                 {% elif user["availability"] == "Busy" %}
 
-                <span class="busy">
-
-                    🟡 Currently busy
-
-                </span>
+                    <span class="busy">
+                        🟡 Currently busy
+                    </span>
 
                 {% elif user["availability"] == "Not Available" %}
 
-                <span class="not-available">
-
-                    🔴 Not available
-
-                </span>
+                    <span class="not-available">
+                        🔴 Not available
+                    </span>
 
                 {% endif %}
 
             </div>
 
-
         </div>
 
 
-
-        <!-- BIO -->
+        <!-- ======================================
+             ABOUT
+        ======================================= -->
 
         {% if user["bio"] %}
 
         <section class="profile-section">
 
-            <h2>
-                About
-            </h2>
+            <h2>📝 About</h2>
 
             <p>
                 {{ user["bio"] }}
@@ -168,27 +167,27 @@
         {% endif %}
 
 
-
-        <!-- SKILLS -->
+        <!-- ======================================
+             SKILLS
+        ======================================= -->
 
         {% if user["skills"] %}
 
         <section class="profile-section">
 
-            <h2>
-                Skills
-            </h2>
-
+            <h2>🛠️ Skills</h2>
 
             <div class="skill-list">
 
                 {% for skill in user["skills"].split(",") %}
 
-                <span class="skill">
+                    {% if skill.strip() %}
 
-                    {{ skill.strip() }}
+                        <span class="skill">
+                            {{ skill.strip() }}
+                        </span>
 
-                </span>
+                    {% endif %}
 
                 {% endfor %}
 
@@ -199,22 +198,18 @@
         {% endif %}
 
 
-
-        <!-- LOOKING FOR -->
+        <!-- ======================================
+             LOOKING FOR
+        ======================================= -->
 
         {% if user["looking_for"] %}
 
         <section class="profile-section">
 
-            <h2>
-                Looking For
-            </h2>
-
+            <h2>🤝 Looking For</h2>
 
             <p>
-
                 {{ user["looking_for"] }}
-
             </p>
 
         </section>
@@ -222,63 +217,89 @@
         {% endif %}
 
 
+        <!-- ======================================
+             AVAILABILITY
+        ======================================= -->
 
-        <!-- SOCIAL LINKS -->
+        {% if user["availability"] %}
 
         <section class="profile-section">
 
-            <h2>
-                Connect
-            </h2>
+            <h2>📅 Availability</h2>
 
+            <p>
+                {{ user["availability"] }}
+            </p>
+
+        </section>
+
+        {% endif %}
+
+
+        <!-- ======================================
+             SOCIAL LINKS
+        ======================================= -->
+
+        {% if user["github"]
+           or user["linkedin"]
+           or user["youtube"]
+           or user["portfolio"] %}
+
+        <section class="profile-section">
+
+            <h2>🔗 Connect</h2>
 
             <div class="social-links">
 
 
                 {% if user["github"] %}
 
-                <a
-                    href="{{ user['github'] }}"
-                    target="_blank"
-                >
-                    GitHub
-                </a>
+                    <a
+                        href="{{ user['github'] }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        💻 GitHub
+                    </a>
 
                 {% endif %}
 
 
                 {% if user["linkedin"] %}
 
-                <a
-                    href="{{ user['linkedin'] }}"
-                    target="_blank"
-                >
-                    LinkedIn
-                </a>
+                    <a
+                        href="{{ user['linkedin'] }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        💼 LinkedIn
+                    </a>
 
                 {% endif %}
 
 
                 {% if user["youtube"] %}
 
-                <a
-                    href="{{ user['youtube'] }}"
-                    target="_blank"
-                >
-                    YouTube
-                </a>
+                    <a
+                        href="{{ user['youtube'] }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        ▶️ YouTube
+                    </a>
 
                 {% endif %}
 
 
                 {% if user["portfolio"] %}
 
-                <a
-                    href="{{ user['portfolio'] }}"
-                    target="_blank"
-                >
-                    Portfolio
-                </a>
+                    <a
+                        href="{{ user['portfolio'] }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        🌐 Portfolio
+                    </a>
 
                 {% endif %}
 
@@ -287,27 +308,41 @@
 
         </section>
 
-
-
-        <!-- COLLABORATE BUTTON -->
-
-        {% if session["user_id"] != user["id"] %}
-
-        <a
-               href="{{ url_for('chat', user_id=user['id']) }}"
-               class="primary-button"
-     >
-    💬 Chat
-        </a>
-
         {% endif %}
+
+
+        <!-- ======================================
+             ACTIONS
+        ======================================= -->
+
+        <div class="profile-actions">
+
+            {% if session["user_id"] == user["id"] %}
+
+                <a
+                    href="{{ url_for('edit_profile') }}"
+                    class="primary-button"
+                >
+                    ✏️ Edit Profile
+                </a>
+
+            {% else %}
+
+                <a
+                    href="{{ url_for('chat', user_id=user['id']) }}"
+                    class="primary-button"
+                >
+                    💬 Chat
+                </a>
+
+            {% endif %}
+
+        </div>
 
 
     </div>
 
-
 </main>
-
 
 </body>
 

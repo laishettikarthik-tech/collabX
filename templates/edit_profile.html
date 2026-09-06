@@ -5,10 +5,7 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Edit Profile - CollabX</title>
 
@@ -19,31 +16,26 @@
 
 </head>
 
-
 <body>
-
 
 <nav class="navbar">
 
     <div class="nav-logo">
-
         Collab<span>X</span>
-
     </div>
-
 
     <div class="nav-links">
 
-        <a href="/dashboard">
-            Dashboard
+        <a href="{{ url_for('dashboard') }}">
+            🏠 Dashboard
         </a>
 
-        <a href="/profile">
-            My Profile
+        <a href="{{ url_for('profile') }}">
+            👤 My Profile
         </a>
 
-        <a href="/logout">
-            Logout
+        <a href="{{ url_for('logout') }}">
+            🚪 Logout
         </a>
 
     </div>
@@ -51,33 +43,25 @@
 </nav>
 
 
-
 <main class="profile-page">
 
-
     <div class="profile-form">
-
 
         <h1>
             Edit Your Profile ✨
         </h1>
 
-
         <p class="subtitle">
-
-            Tell people who you are and
-            what kind of collaborations
+            Tell people who you are and what kind of collaborations
             you're looking for.
-
         </p>
 
 
         <form
-            action="/edit-profile"
+            action="{{ url_for('edit_profile') }}"
             method="POST"
             enctype="multipart/form-data"
         >
-
 
             <!-- PROFILE PICTURE -->
 
@@ -91,12 +75,13 @@
                             filename=user['profile_picture']
                         ) }}"
                         class="profile-picture"
+                        alt="Profile Picture"
                     >
 
                 {% else %}
 
                     <div class="profile-placeholder">
-                        {{ user["first_name"][0] }}
+                        {{ user["first_name"][0] | upper }}
                     </div>
 
                 {% endif %}
@@ -111,13 +96,12 @@
                     <input
                         type="file"
                         name="profile_picture"
-                        accept="image/*"
+                        accept=".png,.jpg,.jpeg,.gif,.webp"
                     >
 
                 </div>
 
             </div>
-
 
 
             <!-- BIO -->
@@ -133,7 +117,6 @@
             >{{ user["bio"] or "" }}</textarea>
 
 
-
             <!-- LOCATION -->
 
             <label>
@@ -146,7 +129,6 @@
                 value="{{ user['location'] or '' }}"
                 placeholder="India"
             >
-
 
 
             <!-- SKILLS -->
@@ -167,7 +149,6 @@
             </small>
 
 
-
             <!-- LOOKING FOR -->
 
             <label>
@@ -178,9 +159,8 @@
                 type="text"
                 name="looking_for"
                 value="{{ user['looking_for'] or '' }}"
-                placeholder="Robotics projects, startups, YouTube collaborations"
+                placeholder="Robotics projects, startups, collaborations"
             >
-
 
 
             <!-- AVAILABILITY -->
@@ -194,44 +174,40 @@
                 <option
                     value=""
                     {% if not user["availability"] %}
-                    selected
+                        selected
                     {% endif %}
                 >
                     Select availability
                 </option>
 
-
                 <option
                     value="Available"
                     {% if user["availability"] == "Available" %}
-                    selected
+                        selected
                     {% endif %}
                 >
                     🟢 Available
                 </option>
 
-
                 <option
                     value="Busy"
                     {% if user["availability"] == "Busy" %}
-                    selected
+                        selected
                     {% endif %}
                 >
                     🟡 Busy
                 </option>
 
-
                 <option
                     value="Not Available"
                     {% if user["availability"] == "Not Available" %}
-                    selected
+                        selected
                     {% endif %}
                 >
                     🔴 Not Available
                 </option>
 
             </select>
-
 
 
             <!-- SOCIAL LINKS -->
@@ -289,7 +265,6 @@
             >
 
 
-
             <!-- BUTTONS -->
 
             <div class="form-buttons">
@@ -303,7 +278,7 @@
 
 
                 <a
-                    href="/dashboard"
+                    href="{{ url_for('dashboard') }}"
                     class="secondary-button"
                 >
                     Cancel
@@ -311,15 +286,11 @@
 
             </div>
 
-
         </form>
-
 
     </div>
 
-
 </main>
-
 
 </body>
 
