@@ -113,6 +113,15 @@
                     {{ user["role"] }}
                 </p>
 
+                {% if user["last_seen"] %}
+                    <p class="last-seen">
+                {% if online_status == "Online now" %}
+                   🟢 {{ online_status }}
+                {% else %}
+                   ⚪ {{ online_status }}
+                {% endif %}
+                    </p>
+                {% endif %}
 
                 {% if user["location"] %}
 

@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import (
     Flask,
     render_template,
@@ -48,7 +49,6 @@ os.makedirs(
     exist_ok=True
 )
 
-
 # ==========================================
 # DATABASE CONNECTION
 # ==========================================
@@ -62,6 +62,42 @@ def get_db():
     connection.row_factory = sqlite3.Row
 
     return connection
+
+
+# ==========================================
+# ONLINE STATUS
+# ==========================================
+
+def get_online_status(last_seen):
+
+    if not last_seen:
+        return "Offline"
+
+    last_seen_time = datetime.strptime(
+        last_seen,
+        "%Y-%m-%d %H:%M:%S"
+    )
+
+    now = datetime.now()
+
+    seconds = (now - last_seen_time).total_seconds()
+
+    if seconds < 120:
+        return "Online now"
+
+    minutes = int(seconds // 60)
+
+    if minutes < 60:
+        return f"Last seen {minutes} minutes ago"
+
+    hours = minutes // 60
+
+    if hours < 24:
+        return f"Last seen {hours} hours ago"
+
+    days = hours // 24
+
+    return f"Last seen {days} days ago"
 
 
 # ==========================================
@@ -774,43 +810,35 @@ def edit_profile():
 # PUBLIC PROFILE
 # ==========================================
 
-@app.route(
-    "/profile/<int:user_id>"
-)
+@app.route("/profile/<int:user_id>")
 def public_profile(user_id):
 
     connection = get_db()
-
 
     user = connection.execute("""
         SELECT
             users.*,
             profiles.*
-
         FROM users
-
         LEFT JOIN profiles
         ON users.id = profiles.user_id
-
         WHERE users.id = ?
-
-    """, (
-        user_id,
-    )).fetchone()
-
+    """, (user_id,)).fetchone()
 
     connection.close()
 
-
     if user is None:
-
         return "User not found", 404
 
+    online_status = get_online_status(
+        user["last_seen"]
+)
 
     return render_template(
         "profile.html",
-        user=user
-    )
+        user=user,
+        online_status=online_status
+)
 
 
 # ==========================================
@@ -1799,6 +1827,14 @@ def inject_unread_messages():
         }
 
     connection = get_db()
+
+    connection.execute("""
+        UPDATE users
+        SET last_seen = CURRENT_TIMESTAMP
+        WHERE id = ?
+    """, (session["user_id"],))
+
+    connection.commit()
 
     unread_messages = connection.execute("""
         SELECT COUNT(*) AS count
